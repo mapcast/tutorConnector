@@ -1,6 +1,14 @@
+<%@page import="bean.UserBean"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
+<jsp:useBean id="mgr" class="mgr.UserMgr"/>
 <%
-		request.setCharacterEncoding("EUC-KR");
+	request.setCharacterEncoding("EUC-KR");
+		int userNum=0;
+		UserBean bean=new UserBean();
+		if(session.getAttribute("userNum")!=null){
+	userNum=(Integer)session.getAttribute("userNum");
+	bean=mgr.getUser(userNum);
+		}
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,20 +33,20 @@
         text-decoration: none;
       }
       #contentWrap {
-        padding: 0 400px;
-        padding-bottom: 40px;
+        padding: 0 21vw;
         height: auto;
-        margin-top: 40px;
+        margin-top: 70px;
+        font-family: "Spoqa Han Sans", "Spoqa Han Sans JP", "Sans-serif";
       }
       #mainSlider {
         width: 100%;
-        height: 35vh;
+        height: 400px;
         border-radius: 6px;
         margin: 0;
       }
       .slideContent {
         width: 100%;
-        height: 30vh;
+        height: 370px;
         background-size: cover;
         border-radius: 6px;
       }
@@ -53,23 +61,52 @@
       }
       #slider-div2 {
         width: 100%;
-        height: 30vh;
-        margin-top: 20px;
+        height: 300px;
       }
       .s2_content {
         background-color: white;
         padding: 30px 30px;
-        border-radius: 6px;
         width: 100%;
-        height: 280px;
+        height: 400px;
       }
       .s2_item {
-        background-color: black;
+        border-radius: 6px;
         width: 100%;
         height: 100%;
+        border: 2px solid rgb(88, 193, 137);
+        border-radius: 4px;
+      }
+      .s2i_img {
+        width: 100%;
+        height: 180px;
+        border-radius: 4px 4px 0 0;
+        padding: 20px;
+      }
+      .s2i_content {
+        padding: 5px 20px;
+        font-size: 16px;
+      }
+      .s2i_name {
+        font-weight: 400;
+        font-size: 18px;
+        height: 30px;
+        color: #222222;
+      }
+      .s2i_profile {
+        height: 24px;
+        margin-top: 2px;
+        display: flex;
+        font-weight: 400;
+      }
+      .s2i_svg {
+        width: 24px;
+        height: 24px;
+      }
+      .s2i_desc {
+        font-size: 16px;
+        color: #666666;
       }
       #mainReviews {
-        margin-top: 20px;
         width: 100%;
         height: 400px;
       }
@@ -82,8 +119,125 @@
         border-radius: 6px;
         width: 50%;
         height: 200px;
+        padding: 15px;
+      }
+      .reviews {
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        display: flex;
+        border-radius: 6px;
+        box-shadow: 3px 3px 4px #cccccc;
+      }
+      .reviewImg {
+        width: 170px;
+        height: 170px;
+        padding: 20px;
+      }
+      .reviewDescWrap {
+        width: 100%;
+        height: 100%;
+        padding: 20px 0;
+        padding-right: 20px;
+      }
+      .reviewDesc {
+        width: 100%;
+        height: 100%;
+      }
+      .rdTitle {
+        width: 100%;
+        height: 40px;
+        font-size: 20px;
+        font-weight: 800;
+        padding-top: 3px;
+      }
+      .rdContent {
+        width: 100%;
+        height: 88px;
+        font-size: 14px;
+        font-weight: 400;
+        word-break: break-all;
+      }
+      .mainTitles {
+        font-size: 22px;
+        font-weight: 800;
+        color: #666666;
+        margin-top: 20px;
+        text-align: center;
+      }
+      #graphImg {
+        background-image: url("img/graph.jpg");
+        background-size: cover;
+        width: 100%;
+        height: 800px;
+      }
+      .startdiv {
+        text-align: center;
+        height: 140px;
+        margin-top: 30px;
+      }
+      .startbutton {
+        padding: 0.75em 2em;
+        text-align: center;
+        text-decoration: none;
+        color: #2194e0;
+        border: 2px solid #2194e0;
+        font-size: 24px;
+        display: inline-block;
+        border-radius: 0.3em;
+        -webkit-transition: all 0.2s ease-in-out;
+        transition: all 0.2s ease-in-out;
+        position: relative;
+        overflow: hidden;
+      }
+      .startbutton:before {
+        content: "";
+        background-color: rgba(255, 255, 255, 0.5);
+        height: 100%;
+        width: 3em;
+        display: block;
+        position: absolute;
+        top: 0;
+        left: -4.5em;
+        -webkit-transform: skewX(-45deg) translateX(0);
+        transform: skewX(-45deg) translateX(0);
+        -webkit-transition: none;
+        transition: none;
+      }
+
+      .startbutton:hover {
+        background-color: #2194e0;
+        color: #fff;
+        border-bottom: 4px solid #1977b5;
+      }
+
+      .startbutton:hover:before {
+        -webkit-transform: skewX(-45deg) translateX(13.5em);
+        transform: skewX(-45deg) translateX(13.5em);
+        -webkit-transition: all 0.5s ease-in-out;
+        transition: all 0.5s ease-in-out;
       }
     </style>
+    <link
+      href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-jp.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script>
+    function openChatting(num){
+		if(num==0){
+			alert("채팅 기능은 로그인 후 이용하실 수 있습니다.");
+		}else{
+			url="chatting.jsp?userNum="+num;
+			window.open(url, "chat", "width=1000, height=601, scrollbars=no, location=no, toobar=no, menubar=no");
+		}
+	}
+    </script>
   </head>
   <body>
     <header include-html="header.jsp"></header>
@@ -95,27 +249,200 @@
           <a href="#"><div class="slideContent" id="SC3"></div></a>
         </div>
       </div>
+      <div class="mainTitles">- 사이트 이용 후기 -</div>
       <div id="mainReviews">
         <div class="reviewflex">
-          <div class="review" style="background-color: cornflowerblue;"></div>
-          <div class="review" style="background-color: violet;"></div>
+          <div class="review">
+            <div class="reviews">
+              <div class="reviewImg">
+                <img src="img/example.jpg" width="130px" height="130px" />
+              </div>
+              <div class="reviewDescWrap">
+                <div class="reviewDesc">
+                  <div class="rdTitle">평균 성적이 20점 올랐어요</div>
+                  <div class="rdContent">
+                    과외커넥터에서 김아미솔 선생님과 수업을 1년 하고 평균 성적
+                    20점 전교 등수 50등이 올랐어요!
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="review">
+            <div class="reviews">
+              <div class="reviewImg">
+                <img src="img/example.jpg" width="130px" height="130px" />
+              </div>
+              <div class="reviewDescWrap">
+                <div class="reviewDesc">
+                  <div class="rdTitle">드디어 토익을 끝냈습니다.</div>
+                  <div class="rdContent">
+                    토익 졸업 점수가 필요했어요 ㅠㅠ 이번 과외를 통해서 토익
+                    100점 받았네요.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="reviewflex">
-          <div class="review" style="background-color: lemonchiffon;"></div>
-          <div class="review" style="background-color: goldenrod;"></div>
+          <div class="review">
+            <div class="reviews">
+              <div class="reviewImg">
+                <img src="img/example.jpg" width="130px" height="130px" />
+              </div>
+              <div class="reviewDescWrap">
+                <div class="reviewDesc">
+                  <div class="rdTitle">친구같은 선생</div>
+                  <div class="rdContent">
+                    김유진 선생님! 집도 가깝고 과외 시간 아니라도 가끔 만나서
+                    수다 떨수 있는 선생님이랑 과외해..
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="review">
+            <div class="reviews">
+              <div class="reviewImg">
+                <img src="img/example.jpg" width="130px" height="130px" />
+              </div>
+              <div class="reviewDescWrap">
+                <div class="reviewDesc">
+                  <div class="rdTitle">작곡 과외? ㅋㅋ</div>
+                  <div class="rdContent">
+                    평소 작곡 분야에 관심이 많았는데 어떻게 시작할지 항상
+                    고민이였어요. 그런데 과외커넥터에서 작곡..
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      <div class="mainTitles">- 오늘의 추천 선생님 -</div>
       <div id="slider-div2">
-        <div class="s2_content"><div class="s2_item"></div></div>
-        <div class="s2_content"><div class="s2_item"></div></div>
-        <div class="s2_content"><div class="s2_item"></div></div>
-        <div class="s2_content"><div class="s2_item"></div></div>
-        <div class="s2_content"><div class="s2_item"></div></div>
-        <div class="s2_content"><div class="s2_item"></div></div>
+        <div class="s2_content">
+          <a href="">
+            <div class="s2_item">
+              <div class="s2i_img">
+                <img src="img/ex3.jpg" width="262px" height="160px" />
+              </div>
+              <div class="s2i_content">
+                <div class="s2i_name">부천강냉이</div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/study.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">하버드대 법학과</div>
+                </div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/class.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">법조</div>
+                </div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/range.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">성인</div>
+                </div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/location.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">서울</div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="s2_content">
+          <a href="">
+            <div class="s2_item">
+              <div class="s2i_img">
+                <img src="img/ex2.jpg" width="262px" height="160px" />
+              </div>
+              <div class="s2i_content">
+                <div class="s2i_name">울산나얼</div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/study.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">MIT 성악과</div>
+                </div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/class.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">영어, 농업</div>
+                </div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/range.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">상관 없음</div>
+                </div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/location.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">부산</div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div class="s2_content">
+          <a href="">
+            <div class="s2_item">
+              <div class="s2i_img">
+                <img src="img/ex4.jpg" width="262px" height="160px" />
+              </div>
+              <div class="s2i_content">
+                <div class="s2i_name">콥아영</div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/study.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">하버드대 경제학과</div>
+                </div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/class.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">수학</div>
+                </div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/range.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">고등학생</div>
+                </div>
+                <div class="s2i_profile">
+                  <div class="s2i_svg">
+                    <img src="img/location.png" width="24px" />
+                  </div>
+                  <div class="s2i_desc">샌프란시스코</div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
         <div class="s2_content"><div class="s2_item"></div></div>
       </div>
+      <div id="graphImg"></div>
+      <div class="startdiv">
+        <%if(userNum!=0){ %>
+        <a href="findteacher.jsp" class="startbutton">시작하기</a>
+        <%}else{ %>
+        <a href="login.jsp" class="startbutton">시작하기</a>
+        <%} %>
+      </div>
     </div>
-    <footer include-html="footer.jsp"></footer>
+	<div include-html="footer.jsp"></div>
+
     <script>
       includeHTML();
       $(function () {

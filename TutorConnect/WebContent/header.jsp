@@ -1,6 +1,14 @@
+<%@page import="bean.UserBean"%>
 <%@ page contentType="text/html; charset=EUC-KR"%>
+<jsp:useBean id="mgr" class="mgr.UserMgr"/>
 <%
-		request.setCharacterEncoding("EUC-KR");
+	request.setCharacterEncoding("EUC-KR");
+		int userNum=0;
+		UserBean bean=new UserBean();
+		if(session.getAttribute("userNum")!=null){
+		userNum=(Integer)session.getAttribute("userNum");
+		bean=mgr.getUser(userNum);
+		}
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,38 +45,18 @@
       }
       #pt_menu {
         width: 100%;
-        height: 140px;
+        height: 180px;
         display: flex;
         justify-content: space-between;
-        padding: 25px 450px;
+        padding: 25px 24vw;
       }
       #ptb_menu {
         width: 100%;
         height: 60px;
         display: flex;
         justify-content: space-between;
-        padding: 0 400px;
-        /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#feffff+0,ddf1f9+35,a0d8ef+100;Blue+3D+%2318 */
-        background: rgb(254, 255, 255); /* Old browsers */
-        background: -moz-linear-gradient(
-          top,
-          rgba(00, 198, 189, 1) 100%,
-          rgba(50, 230, 220, 1) 35%,
-          rgba(00, 198, 189, 1) 100%
-        ); /* FF3.6-15 */
-        background: -webkit-linear-gradient(
-          top,
-          rgba(00, 198, 189, 1) 100%,
-          rgba(50, 230, 220, 1) 35%,
-          rgba(00, 198, 189, 1) 100%
-        ); /* Chrome10-25,Safari5.1-6 */
-        background: linear-gradient(
-          to bottom,
-          rgba(100, 255, 255, 1) 0%,
-          rgba(50, 230, 220, 1) 35%,
-          rgba(00, 198, 189, 1) 100%
-        ); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffff', endColorstr='#a0d8ef',GradientType=0 ); /* IE6-9 */
+        padding: 0 21vw;
+        background: rgb(88, 193, 137);
       }
       .ptb_menus {
         width: 300px;
@@ -79,13 +67,12 @@
         text-align: center;
         padding: 12px 0;
         color: #ffffff;
-        font-size: 20px;
         font-weight: 800;
       }
       .ptb_items a {
         padding: 10px;
         font-family: "Jua", sans-serif;
-        color: #006666;
+        color: white;
         font-size: 23px;
         font-weight: 700;
         text-shadow: none;
@@ -138,18 +125,13 @@
         -moz-transform: translateY(0px);
         transform: translateY(0px);
       }
-      #pt_logo > a {
-        font-size: 45px;
-        font-weight: 800;
-        color: #00c6bd;
-      }
       .pt_items {
-        padding-top: 65px;
+        padding-top: 105px;
       }
       .pt_items > a {
-        font-size: 22px;
+        font-size: 16px;
         color: #00c6bd;
-        font-family: "Nanum Pen Script", cursive;
+        font-family: "Jua", sans-serif;
         font-weight: 400;
       }
       .pt_items a::before,
@@ -191,18 +173,28 @@
       }
       #selectLanguage {
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         padding-right: 40px;
         height: 30px;
         background-color: #eeeeee;
       }
       .slitem {
-        color: black;
+        color: #999999;
+        height: 100%;
         padding: 0 15px;
         border-left: 1px solid #cccccc;
       }
       .slitem:hover {
         background-color: #cccccc;
+      }
+      #slright {
+        display: flex;
+      }
+      #slleft {
+        padding-left: 300px;
+        padding-top: 2px;
+        font-weight: 800;
+        color: rgb(88, 193, 137);
       }
     </style>
     <script src="js/modernizr.custom.js"></script>
@@ -217,28 +209,47 @@
   </head>
   <body>
     <div id="selectLanguage">
-      <a href="#"><div class="slitem">English</div></a>
-      <a href="#"
-        ><div class="slitem" style="border-right: 1px solid #cccccc;">
-          日本語
-        </div></a
-      >
+      <div id="slleft">
+      	<%if(userNum!=0){ %>
+      		<%=bean.getUserName()%>님 환영합니다!!
+      	<%} %>
+      </div>
+      <div id="slright">
+        <a href="#"><div class="slitem">English</div></a>
+        <a href="#">
+          <div class="slitem" style="border-right: 1px solid #cccccc;">
+            日本語
+          </div>
+        </a>
+      </div>
     </div>
     <div id="page_top">
       <div id="pt_menu">
         <div class="pt_items"><a href="">고객센터</a></div>
         <div id="pt_logo">
-          <a href=""><img src="img/logo.jpg" width="250px" /></a>
+          <a href="main.jsp"><img src="img/logo2.jpg" width="250px" /></a>
         </div>
         <div class="pt_items">
-          <a href="">로그인</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="">회원가입</a>
+          <%if(userNum==0){ %>
+          <a href="login.jsp">로그인</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="join.jsp">회원가입</a>
+          <%}else{ %>
+          <a href="mypage.jsp">마이페이지</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="logoutProc.jsp">로그아웃</a>
+          <%} %>
         </div>
       </div>
       <div id="ptb_menu">
         <div class="ptb_items"><a href="#">선생님 찾기</a></div>
         <div class="ptb_items"><a href="#">학생 찾기</a></div>
-        <div class="ptb_items"><a href="#">선생님 등록</a></div>
-        <div class="ptb_items"><a href="#">학생 등록</a></div>
+        <%if(userNum!=0){ %>
+        <div class="ptb_items"><a href="joinTeacher.jsp">선생님 등록</a></div>
+        <%}else{ %>
+        <div class="ptb_items"><a href="login.jsp">선생님 등록</a></div>
+        <%} %>
+        <%if(userNum!=0){ %>
+        <div class="ptb_items"><a href="joinStudent.jsp">학생 등록</a></div>
+        <%}else{ %>
+        <div class="ptb_items"><a href="login.jsp">학생 등록</a></div>
+        <%} %>
       </div>
     </div>
   </body>

@@ -1,6 +1,10 @@
 <%@ page contentType="text/html; charset=EUC-KR"%>
 <%
 		request.setCharacterEncoding("EUC-KR");
+		int userNum=0;
+		if(session.getAttribute("userNum")!=null){
+		userNum=(Integer)session.getAttribute("userNum");
+		}
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -8,6 +12,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <script>
+    </script>
     <style>
       * {
         box-sizing: border-box;
@@ -20,39 +26,23 @@
         text-decoration: none;
       }
       #page_bottom {
-        bottom: 0;
-        left: 0;
-        right: 0;
+      cursor:pointer;
+        bottom: 20px;
+        right: 20px;
         position: fixed;
-        height: 50px;
-        background: #00c6bd;
-        display: flex;
-        justify-content: end;
-        padding-left: 85%;
-      }
-      .bottomButton {
-        width: 100px;
-        color: white;
-        font-size: 20px;
-        font-weight: 800;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        border-left: 2px solid white;
-        text-align: center;
-      }
-      .bottomButton:hover {
-        background-color: #00dddd;
+        height: 60px;
+        width: 60px;
+        background: red;
+        border-radius: 6px;
+        padding: 5px;
       }
     </style>
+    <script>
+    	
+    </script>
   </head>
   <body>
-    <div id="page_bottom">
-      <a href=""><div class="bottomButton">채팅</div></a>
-      <a href="">
-        <div class="bottomButton" style="border-right: 2px solid white;">
-          알림
-        </div>
-      </a>
+    <div id="page_bottom" onclick="openChatting('<%=userNum%>')"><img src="img/chat.svg" width="50px" />
     </div>
   </body>
 </html>
