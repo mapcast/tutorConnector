@@ -7,7 +7,6 @@ public class ReviewBean {
 	private int reviewAvailable; //삭제여부
 	private String reviewContent; //리뷰 내용
 	private int reviewRate; //리뷰 평점
-	private String userImage; //회원 이미지 (추가)
 	private String ip; //ip수집
 	
 	public int getNum() {
@@ -45,12 +44,6 @@ public class ReviewBean {
 	}
 	public void setReviewRate(int reviewRate) {
 		this.reviewRate = reviewRate;
-	}
-	public String getUserImage() {
-		return userImage;
-	}
-	public void setUserImage(String userImage) {
-		this.userImage = userImage;
 	}
 	public String getIp() {
 		return ip;

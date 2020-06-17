@@ -3,7 +3,7 @@ package bean;
 public class TeacherBean {
 	private int userNum; //회원 고유번호
 	private String tRecord; //최종 학력
-	private String tRange; //교습 대상
+	private int tRange; //교습 대상
 	private String tSubject1;//교습과목 (중복가능) 배열
 	private String tSubject2;//교습과목 (중복가능) 배열
 	private String tSubject3;//교습과목 (중복가능) 배열
@@ -12,7 +12,7 @@ public class TeacherBean {
 	private String tArea3; //희망지역 (중복가능)
 	private String tDay; //희망요일(중복가능) 
 	private String tTime; //희망 과외 시간
-	private String tFee; //희망 과외비 
+	private int tFee; //희망 과외비 
 	private String tNickname; //닉네임
 	private String tPR; //자기소개
 	private int tGrade; //선생님등급(추후 사용)
@@ -32,10 +32,10 @@ public class TeacherBean {
 	public void settRecord(String tRecord) {
 		this.tRecord = tRecord;
 	}
-	public String gettRange() {
+	public int gettRange() {
 		return tRange;
 	}
-	public void settRange(String tRange) {
+	public void settRange(int tRange) {
 		this.tRange = tRange;
 	}
 	public String gettSubject1() {
@@ -86,10 +86,10 @@ public class TeacherBean {
 	public void settTime(String tTime) {
 		this.tTime = tTime;
 	}
-	public String gettFee() {
+	public int gettFee() {
 		return tFee;
 	}
-	public void settFee(String tFee) {
+	public void settFee(int tFee) {
 		this.tFee = tFee;
 	}
 	public String gettNickname() {

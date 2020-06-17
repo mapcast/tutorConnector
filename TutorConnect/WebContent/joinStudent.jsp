@@ -35,7 +35,7 @@
 		Vector<String> jnSt=imgr.searchByCity("전남");
 		Vector<String> kbSt=imgr.searchByCity("경북");
 		Vector<String> knSt=imgr.searchByCity("경남");
-		Vector<String> jjSt=imgr.searchByCity("재주");
+		Vector<String> jjSt=imgr.searchByCity("제주");
 %>
 
 <!DOCTYPE html>
@@ -220,6 +220,10 @@
       type="text/css"
     />
     <script>
+    if(<%=userNum%>==0){
+    	  alert("허용되지 않은 접근입니다.")
+    	  location.href="main.jsp";
+      }
     	function showSub2(){
 	        var sub2=document.getElementById("hjf1");
 	        sub2.style.display="flex";
@@ -276,9 +280,19 @@
         		form.submit();
     		}
     	}
-    	
-    	function areaChange(){
-    		
+    	function openChatting(num){
+    		if(num==0){
+    			alert("채팅 기능은 로그인 후 이용하실 수 있습니다.");
+    		}else{
+    			url="chatting.jsp?userNum="+num;
+    			window.open(url, "chat", "width=1000, height=601, scrollbars=no, location=no, toobar=no, menubar=no");
+    		}
+    	}
+        function alreadyStudent(){
+    		alert("이미 학생으로 등록되어 있습니다!");
+    	}
+    	function alreadyTeacher(){
+    		alert("이미 선생님으로 등록되어 있습니다!");
     	}
     </script>
   </head>
@@ -309,7 +323,7 @@
         <div class="joinFlex">
           <div class="inputDesc">닉네임</div>
           <div class="inputBox">
-            <input type="text" name="sNickname" class="input" placeholder="10자 제한"/>
+            <input type="text" name="sNickname" class="input" placeholder="10자 제한" maxlength="10"/>
           </div>
         </div>
         <div class="joinFlex">
@@ -472,7 +486,7 @@
             </select>
         </div>
         <div class="joinFlex">
-          <div class="inputDesc">수업수</div>
+          <div class="inputDesc">수업횟수</div>
             <select class="bigSelect" name="sDay">
               <option value="협의" selected>협의
               <option value="주2회">주2회
@@ -514,13 +528,14 @@
       </div>
     </div>
     <div include-html="footer.jsp"></div>
+    <div include-html="footer1.jsp"></div>
     <script>
       includeHTML();
-      $(document).ready(function () {
+      /* $(document).ready(function () {
           $('html, body').animate({
               scrollTop: $('#contentWrap').offset().top
           }, 'fast'); //slow
-      });
+      }); */
       function subjectChange1(){
   		ss1=document.studentFrm.ss1.value;
   		if(ss1=="수학"){

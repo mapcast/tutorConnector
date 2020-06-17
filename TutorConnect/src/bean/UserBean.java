@@ -11,6 +11,8 @@ public class UserBean {
 	private String userEmail;
 	private String userBirth;
 	private String userGender;
+	private String userAddress2;
+	private int userLastMessage;
 	public int getUserNum() {
 		return userNum;
 	}
@@ -65,6 +67,16 @@ public class UserBean {
 	public void setUserGender(String userGender) {
 		this.userGender = userGender;
 	}
-	
-	
+	public String getUserAddress2() {
+		return userAddress2;
+	}
+	public void setUserAddress2(String userAddress2) {
+		this.userAddress2 = userAddress2;
+	}
+	public int getUserLastMessage() {
+		return userLastMessage;
+	}
+	public void setUserLastMessage(int userLastMessage) {
+		this.userLastMessage = userLastMessage;
+	}
 }

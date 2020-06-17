@@ -12,6 +12,28 @@ public class InfoMgr {
 	public InfoMgr() {
 		pool=DBConnectionMgr.getInstance();
 	}
+	public String searchMajor(String minor) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		String major=null;
+		try {
+			con = pool.getConnection();
+			sql = "select major from tblsubject where minor=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, minor);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				major=rs.getString(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return major;
+	}
 	
 	public Vector<String> searchMath(){
 		Connection con = null;

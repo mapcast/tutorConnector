@@ -1,14 +1,24 @@
+<%@page import="java.net.URLEncoder"%>
+<%@page import="bean.TeacherBean"%>
+<%@page import="java.util.Vector"%>
 <%@page import="bean.UserBean"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
 <jsp:useBean id="mgr" class="mgr.UserMgr"/>
+<jsp:useBean id="tmgr" class="mgr.TeacherMgr"/>
+<jsp:useBean id="mmgr" class="mgr.MessageMgr"/>
 <%
 	request.setCharacterEncoding("EUC-KR");
 		int userNum=0;
 		UserBean bean=new UserBean();
+		int currentMsg=0;
+		int userLastMessage=0;
 		if(session.getAttribute("userNum")!=null){
-	userNum=(Integer)session.getAttribute("userNum");
-	bean=mgr.getUser(userNum);
+			userNum=(Integer)session.getAttribute("userNum");
+			bean=mgr.getUser(userNum);
+			userLastMessage=bean.getUserLastMessage();
+			currentMsg=mmgr.getCurrentMsgByFooter(userNum);
 		}
+		Vector<TeacherBean> todayTeachers=tmgr.todayTeachers();//랜덤으로 9명의 선생님 불러오기
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,13 +61,16 @@
         border-radius: 6px;
       }
       #SC1 {
-        background: blue;
+        background-image:url("img/regStudent.png");
+        background-size:100% 100%;
       }
       #SC2 {
-        background: yellow;
+        background-image:url("img/regTeacher.png");
+        background-size:100% 100%;
       }
       #SC3 {
-        background: green;
+        background-image:url("img/chatbanner.png");
+        background-size:100% 100%;
       }
       #slider-div2 {
         width: 100%;
@@ -105,6 +118,9 @@
       .s2i_desc {
         font-size: 16px;
         color: #666666;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
       }
       #mainReviews {
         width: 100%;
@@ -128,6 +144,7 @@
         display: flex;
         border-radius: 6px;
         box-shadow: 3px 3px 4px #cccccc;
+        border:1px solid #EEEEEE;
       }
       .reviewImg {
         width: 170px;
@@ -180,8 +197,8 @@
         padding: 0.75em 2em;
         text-align: center;
         text-decoration: none;
-        color: #2194e0;
-        border: 2px solid #2194e0;
+        color: rgb(88, 193, 137);
+        border: 2px solid rgb(88, 193, 137);
         font-size: 24px;
         display: inline-block;
         border-radius: 0.3em;
@@ -206,9 +223,9 @@
       }
 
       .startbutton:hover {
-        background-color: #2194e0;
+        background-color: rgb(88, 193, 137);
         color: #fff;
-        border-bottom: 4px solid #1977b5;
+        border-bottom: 4px solid rgb(58, 163, 107);
       }
 
       .startbutton:hover:before {
@@ -217,6 +234,38 @@
         -webkit-transition: all 0.5s ease-in-out;
         transition: all 0.5s ease-in-out;
       }
+      #chart1_div{
+      	margin-top: 100px;
+      }
+      #chart_div{
+     	margin-top: 100px;
+      }
+     #chartflex{
+     	 display: flex;
+     }
+     #chartDiv{
+     	padding:0 15%;
+     }
+     #chartComment{
+      	 border: 1px solid rgb(88, 193, 137);
+	     border-radius: 4px;
+	     width: 100%;
+	     height:60px;
+	     display:flex;
+	     padding:0 10%;
+	     justify-content:space-between;
+     }
+     .ccDiv{
+     	display:flex;
+     }
+     .ccImg{
+     	padding-top:20px;
+     }
+     .ccText{
+     	padding-top:17px;
+     	font-size:18px;
+     	font-weight:400;
+     }
     </style>
     <link
       href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css"
@@ -228,25 +277,144 @@
       rel="stylesheet"
       type="text/css"
     />
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script>
+    var recentNum=<%=currentMsg%>
+    var temp=0;
+    var flashflag=false;
+    function flashChat(){
+    	var chat=document.getElementById("page_bottom");
+    	if(flashflag){
+    		chat.style.backgroundColor="#FFA500";
+    		flashflag=false;
+    	}else{
+    		chat.style.backgroundColor="red";
+    		flashflag=true;
+    	}
+    }
+    var goFlash;
+    function loop() {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          var data = JSON.parse(this.responseText);
+          console.log(data);
+          if(recentNum!=data.recentNum){
+        	  goFlash=setInterval(flashChat(), 1000);
+          }
+          else{
+          }
+          temp=data.recentNum;
+        }
+      };
+      xhttp.open("GET", "getCurrentMsg.jsp?userNum=<%=userNum%>", true);
+      xhttp.send();
+    }
+    var checkMessage
+	checkMessage=setInterval(loop, 1000);
     function openChatting(num){
 		if(num==0){
 			alert("채팅 기능은 로그인 후 이용하실 수 있습니다.");
 		}else{
+			clearInterval(checkMessage)
+			document.getElementById("page_bottom").style.backgroundColor="red";
 			url="chatting.jsp?userNum="+num;
 			window.open(url, "chat", "width=1000, height=601, scrollbars=no, location=no, toobar=no, menubar=no");
+			recentNum=temp;
 		}
 	}
+    function alreadyStudent(){
+		alert("이미 학생으로 등록되어 있습니다!");
+	}
+	function alreadyTeacher(){
+		alert("이미 선생님으로 등록되어 있습니다!");
+	}
     </script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+  google.load('visualization', '1.0', {'packages':['corechart']});
+	google.setOnLoadCallback(drawChart);
+  function drawChart() {
+         var data = google.visualization.arrayToDataTable([
+           ['Categegories', '학생' , '선생님'  ],
+           ['2018', 140,     140      ],
+           ['2019', 210,  324   ],
+           ['2020', 324,  532],
+         ]);
+         var options = {
+           title: '학생과 선생님 등록 그래프',
+           titleTextStyle: {
+               fontSize: 20,
+             },
+           pointSize: 8,
+           'width': 550,
+           'height': 450,
+           vAxis: {minValue:0, maxValue:100,gridlines:{count:10}},
+         };
+         var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+         chart.draw(data, options);
+       }
+</script>
+    <script type="text/javascript">
+	// 어떤 그래프를 사용할지 지정 : Google Visualization 라이브러리 로드
+	google.load('visualization', '1.0', {'packages':['corechart' ]});
+	// 그래프 API 로드가 완료되면 실행할 수 있도록 이벤트 지정
+	google.setOnLoadCallback(drawChart);
+	function drawChart() {
+		var data = new google.visualization.DataTable();
+		data.addColumn('string', '과목');
+		data.addColumn('number', '비율');
+		data.addRows([
+				['국어', 10],
+				['수학', 24],
+				['영어', 19],
+				['과학', 13],
+				['사회', 12],
+				['외국어', 14],
+				['공인인증', 10],
+				['IT/컴퓨터', 8]
+		]);
+		// 그래프의 옵션을 지정
+		var opt = {
+					  width: 500,
+					  height: 450,
+					  title: '전문 선생님 등록 비율',
+// 					  pieSliceText: 'label',
+					is3D:true,
+					  titleTextStyle: {  fontSize: 20 },
+			 colors: ['rgb(240, 136, 136)', 'rgb(34, 212, 188)', 'rgb(184, 181, 18)', 
+				 'rgb(76, 212, 34)', 'rgb(38, 131, 238)','rgb(139, 34, 224)','rgb(231, 40, 151)','rgb(194, 173, 173)']
+		};
+		var chart = new google.visualization.PieChart(
+				document.getElementById('chart1_div'));
+		chart.draw(data, opt);
+	}
+</script>
   </head>
   <body>
     <header include-html="header.jsp"></header>
     <div id="contentWrap">
       <div id="mainSlider">
         <div id="slider-div">
-          <a href="#"><div class="slideContent" id="SC1"></div></a>
-          <a href="#"><div class="slideContent" id="SC2"></div></a>
-          <a href="#"><div class="slideContent" id="SC3"></div></a>
+        <%if(userNum!=0){ %>
+        	<%if(mgr.isStudent(userNum)){ %>
+        	<a href="javascript:alreadyStudent()"><div class="slideContent" id="SC1"></div></a>
+        	<%}else{ %>
+        	<a href="joinStudent.jsp"><div class="slideContent" id="SC1"></div></a>
+        	<%} %>
+        <%}else{ %>
+        <a href="login.jsp"><div class="slideContent" id="SC1"></div></a>
+        <%} %>
+         <%if(userNum!=0){ %>
+        	<%if(mgr.isTeacher(userNum)){ %>
+        	<a href="javascript:alreadyTeacher()"><div class="slideContent" id="SC2"></div></a>
+        	<%}else{ %>
+        	<a href="joinTeacher.jsp"><div class="slideContent" id="SC2"></div></a>
+        	<%} %>
+        <%}else{ %>
+        <a href="login.jsp"><div class="slideContent" id="SC2"></div></a>
+        <%} %>
+          <a href="javascript:openChatting('<%=userNum%>')"><div class="slideContent" id="SC3"></div></a>
         </div>
       </div>
       <div class="mainTitles">- 사이트 이용 후기 -</div>
@@ -255,14 +423,16 @@
           <div class="review">
             <div class="reviews">
               <div class="reviewImg">
-                <img src="img/example.jpg" width="130px" height="130px" />
+                <img src="img/exam1.png" style="border:1px solid #cccccc;" width="130px" height="130px" />
               </div>
               <div class="reviewDescWrap">
                 <div class="reviewDesc">
                   <div class="rdTitle">평균 성적이 20점 올랐어요</div>
                   <div class="rdContent">
                     과외커넥터에서 김아미솔 선생님과 수업을 1년 하고 평균 성적
-                    20점 전교 등수 50등이 올랐어요!
+                    20점 전교 등수 50등이 올랐어요! 김아미솔 선생님
+                    정말 최고! 과외커넥터 최고!<br><br>
+                    -부산고등학교 2학년 최OO
                   </div>
                 </div>
               </div>
@@ -271,14 +441,15 @@
           <div class="review">
             <div class="reviews">
               <div class="reviewImg">
-                <img src="img/example.jpg" width="130px" height="130px" />
+                <img src="img/exam2.png" style="border:1px solid #cccccc;" width="130px" height="130px" />
               </div>
               <div class="reviewDescWrap">
                 <div class="reviewDesc">
                   <div class="rdTitle">드디어 토익을 끝냈습니다.</div>
                   <div class="rdContent">
                     토익 졸업 점수가 필요했어요 ㅠㅠ 이번 과외를 통해서 토익
-                    100점 받았네요.
+                    100점 받았네요. 저를 토익의 신이라고 불러주세요!<br><br><br>
+                    -도곡고등학교 1학년 김OO
                   </div>
                 </div>
               </div>
@@ -289,14 +460,16 @@
           <div class="review">
             <div class="reviews">
               <div class="reviewImg">
-                <img src="img/example.jpg" width="130px" height="130px" />
+                <img src="img/exam3.png" style="border:1px solid #cccccc;" width="130px" height="130px" />
               </div>
               <div class="reviewDescWrap">
                 <div class="reviewDesc">
                   <div class="rdTitle">친구같은 선생</div>
                   <div class="rdContent">
                     김유진 선생님! 집도 가깝고 과외 시간 아니라도 가끔 만나서
-                    수다 떨수 있는 선생님이랑 과외해..
+                    수다 떨수 있는 선생님이랑 과외하는게 정말 재밌어요. 
+                    앞으로도 잘 부탁드려요.<br><br>
+                    -마포중학교 3학년 강OO
                   </div>
                 </div>
               </div>
@@ -305,14 +478,16 @@
           <div class="review">
             <div class="reviews">
               <div class="reviewImg">
-                <img src="img/example.jpg" width="130px" height="130px" />
+                <img src="img/exam4.png" style="border:1px solid #cccccc;" width="130px" height="130px" />
               </div>
               <div class="reviewDescWrap">
                 <div class="reviewDesc">
                   <div class="rdTitle">작곡 과외? ㅋㅋ</div>
                   <div class="rdContent">
                     평소 작곡 분야에 관심이 많았는데 어떻게 시작할지 항상
-                    고민이였어요. 그런데 과외커넥터에서 작곡..
+                    고민이였어요. 그런데 과외커넥터에서 작곡과외를 받았더니
+                  	마치 제가 베토벤이 된 것 같네요!<br><br>
+                  	-서울고등학교 2학년 조OO
                   </div>
                 </div>
               </div>
@@ -322,127 +497,100 @@
       </div>
       <div class="mainTitles">- 오늘의 추천 선생님 -</div>
       <div id="slider-div2">
-        <div class="s2_content">
+      	<%for(int i=0; i<todayTeachers.size();i++){
+      		TeacherBean teacher=todayTeachers.get(i);
+      		UserBean tInfo=mgr.getUser(teacher.getUserNum());
+      		String range="";
+      		switch(teacher.gettRange()){
+      		case 1:
+      			range="초등학생";
+      			break;
+      		case 2:
+      			range="중학생";
+      			break;
+      		case 3:
+      			range="고등학생";
+      			break;
+      		case 4:
+      			range="대학생";
+      			break;
+      		case 5:
+      			range="성인";
+      			break;
+      		case 6:
+      			range="무관";
+      			break;
+      		}
+      		String area=teacher.gettArea1().substring(0,2);
+      		%>
+      	<div class="s2_content">
           <a href="">
             <div class="s2_item">
               <div class="s2i_img">
-                <img src="img/ex3.jpg" width="262px" height="160px" />
+                <img src="img/<%=URLEncoder.encode(teacher.gettImage(), "EUC-KR") %>" width="262px" height="160px" />
               </div>
               <div class="s2i_content">
-                <div class="s2i_name">부천강냉이</div>
+                <%if(userNum==0){ %>
+                <div class="s2i_name"><%=teacher.gettNickname()%></div>
+                <%}else{ %>
+                <div class="s2i_name"><%=tInfo.getUserName()%></div>
+                <%} %>
                 <div class="s2i_profile">
                   <div class="s2i_svg">
                     <img src="img/study.png" width="24px" />
                   </div>
-                  <div class="s2i_desc">하버드대 법학과</div>
+                  <div class="s2i_desc">학력|<%=teacher.gettRecord()%></div>
                 </div>
                 <div class="s2i_profile">
                   <div class="s2i_svg">
                     <img src="img/class.png" width="24px" />
                   </div>
-                  <div class="s2i_desc">법조</div>
+                  <div class="s2i_desc">과목|<%=teacher.gettSubject1()%> 등</div>
                 </div>
                 <div class="s2i_profile">
                   <div class="s2i_svg">
                     <img src="img/range.png" width="24px" />
                   </div>
-                  <div class="s2i_desc">성인</div>
+                  <div class="s2i_desc">대상|<%=range%></div>
                 </div>
                 <div class="s2i_profile">
                   <div class="s2i_svg">
                     <img src="img/location.png" width="24px" />
                   </div>
-                  <div class="s2i_desc">서울</div>
+                  <div class="s2i_desc">지역|<%=area%></div>
                 </div>
               </div>
             </div>
           </a>
         </div>
-        <div class="s2_content">
-          <a href="">
-            <div class="s2_item">
-              <div class="s2i_img">
-                <img src="img/ex2.jpg" width="262px" height="160px" />
-              </div>
-              <div class="s2i_content">
-                <div class="s2i_name">울산나얼</div>
-                <div class="s2i_profile">
-                  <div class="s2i_svg">
-                    <img src="img/study.png" width="24px" />
-                  </div>
-                  <div class="s2i_desc">MIT 성악과</div>
-                </div>
-                <div class="s2i_profile">
-                  <div class="s2i_svg">
-                    <img src="img/class.png" width="24px" />
-                  </div>
-                  <div class="s2i_desc">영어, 농업</div>
-                </div>
-                <div class="s2i_profile">
-                  <div class="s2i_svg">
-                    <img src="img/range.png" width="24px" />
-                  </div>
-                  <div class="s2i_desc">상관 없음</div>
-                </div>
-                <div class="s2i_profile">
-                  <div class="s2i_svg">
-                    <img src="img/location.png" width="24px" />
-                  </div>
-                  <div class="s2i_desc">부산</div>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="s2_content">
-          <a href="">
-            <div class="s2_item">
-              <div class="s2i_img">
-                <img src="img/ex4.jpg" width="262px" height="160px" />
-              </div>
-              <div class="s2i_content">
-                <div class="s2i_name">콥아영</div>
-                <div class="s2i_profile">
-                  <div class="s2i_svg">
-                    <img src="img/study.png" width="24px" />
-                  </div>
-                  <div class="s2i_desc">하버드대 경제학과</div>
-                </div>
-                <div class="s2i_profile">
-                  <div class="s2i_svg">
-                    <img src="img/class.png" width="24px" />
-                  </div>
-                  <div class="s2i_desc">수학</div>
-                </div>
-                <div class="s2i_profile">
-                  <div class="s2i_svg">
-                    <img src="img/range.png" width="24px" />
-                  </div>
-                  <div class="s2i_desc">고등학생</div>
-                </div>
-                <div class="s2i_profile">
-                  <div class="s2i_svg">
-                    <img src="img/location.png" width="24px" />
-                  </div>
-                  <div class="s2i_desc">샌프란시스코</div>
-                </div>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="s2_content"><div class="s2_item"></div></div>
+      	<%} %>
       </div>
-      <div id="graphImg"></div>
+      <div id ="chartflex">
+      	<div id="chart1_div"></div>
+      	<div id="chart_div"></div>
+      </div>
+      <div id="chartDiv">
+      	<div id="chartComment">
+	      	<div class="ccDiv">
+		      	<div class="ccImg"><img src="img/teacher.svg" style="margin-right: 10px;"/></div>
+		      	<div class="ccText">등록 선생님 : 매년 150명이상 증가 </div>
+	      	</div>
+	      	<div class="ccDiv">
+	      		<div class="ccImg"><img src="img/student.svg" style="margin-right: 10px;"/></div>
+	      		<div class="ccText">등록 학생: 매년 50명이상 증가</div>
+	      	</div>
+      	</div>
+      </div>
       <div class="startdiv">
         <%if(userNum!=0){ %>
-        <a href="findteacher.jsp" class="startbutton">시작하기</a>
+        <a href="Tsearch.jsp" class="startbutton">시작하기</a>
         <%}else{ %>
         <a href="login.jsp" class="startbutton">시작하기</a>
         <%} %>
       </div>
     </div>
 	<div include-html="footer.jsp"></div>
-
+	<footer include-html="footer1.jsp"></footer>
     <script>
       includeHTML();
       $(function () {

@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="js/includeHTML.js"></script>
+    <script type="text/javascript" src="js/jquery-3.5.0.min.js"></script>
     <style>
       * {
         box-sizing: border-box;
@@ -138,7 +139,7 @@
     		alert("이름을 입력하세요!");
     		form.userName.focues();
     	}
-    	else if(form.address1.value==""){
+    	else if(form.userAddress.value==""){
     		alert("주소를 입력하세요!");
     	}
     	else if(form.userPhone.value==""){
@@ -149,24 +150,20 @@
     		alert("이메일을 입력하세요!");
     		form.userEmail.focues();
     	}
-    	else if(form.userEmail.value==""){
-    		alert("이메일을 입력하세요!");
-    		form.userEmail.focues();
-    	}
-    	else if(form.userBirth.value==""){
-    		alert("생년월일을 입력하세요!");
-    		form.userBirth.focues();
-    	} 
+    	else if(form.userBirth.value.length<8){
+     		alert("8자리의 생년월일을 입력해주세요!");
+     		form.userBirth.focues();
+     	} 
     	else{
-    		var add1=form.address1.value;
-    		var add2=form.address2.value;
-    		form.userAddress.value=add1+" "+add2; 
     		form.submit();
     	} 
     }
-    
-
-    
+    function alreadyStudent(){
+  		alert("이미 학생으로 등록되어 있습니다!");
+  	}
+  	function alreadyTeacher(){
+  		alert("이미 선생님으로 등록되어 있습니다!");
+  	}
      </script>
 <!--     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script> -->
 <!--     <script> -->
@@ -240,7 +237,7 @@
         }).open();
          
       }
-    </script>
+      
     </script>
   </head>
   <body>
@@ -279,20 +276,15 @@
           <div style="padding-top: 10px;">
             <div class="inputBox">
 
-              <input type="text" id="sample4_roadAddress" placeholder="도로명주소"  class="input" name="address1"/>
+              <input type="text" id="sample4_roadAddress" placeholder="도로명주소"  class="input" name="userAddress"/>
             </div>
 		<input type="hidden" id="sample4_postcode" placeholder="지번/도로명" class="zipinput"/>
       	<input type="hidden" id="sample4_jibunAddress" placeholder="지번주소"  class="zipinput"/>
       	<span id="guide" style="color: #999; display: none;"></span>
       	<input type="hidden" id="sample4_extraAddress" placeholder="참고항목"  class="zipinput"/>
       	<input type="hidden" id="sample4_detailAddress" placeholder="상세주소"  class="zipinput"/>
-    	
-            
-            
-            
-            
             <div class="inputBox" style="margin-top: 10px;">
-              <input type="text" id="sample4_detailAddress" name="address2" placeholder="상세주소"  class="input"/>
+              <input type="text" id="sample4_detailAddress" name="userAddress2" placeholder="상세주소"  class="input"/>
             </div>
           </div>
           <div id="JFA_buttondiv">
@@ -318,7 +310,7 @@
         <div class="joinFlex">
           <div class="inputDesc">생년월일</div>
           <div class="inputBox">
-            <input type="text" name="userBirth" class="input" value="" placeholder="ex)941218" />
+            <input type="text" name="userBirth" class="input" value="" maxlength="8" placeholder="ex)19941218" numberOnly />
           </div>
         </div>
 
@@ -329,17 +321,19 @@
           <input type="radio" id="iradio" name="userGender" value="1" checked />
           <div class="gender">여</div>
           <input type="radio" id="iradio" name="userGender" value="2" /></div>
-      	<input type="hidden" name="userAddress" value=""> 
       </form>
       <div id="MemberButton1">
         <button class="MemberButton" onclick="inputCheck()">
          회원가입 완료
         </button>
       </div>
-      
-    <div include-html="footer.jsp"></div>
+      </div>
+      <div include-html="footer1.jsp"></div>
     <script>
       includeHTML();
+      $("input:text[numberOnly]").on("keyup", function() {
+    	    $(this).val($(this).val().replace(/[^0-9]/g,""));
+    	});
     </script>
   </body>
 </html>

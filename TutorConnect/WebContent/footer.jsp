@@ -3,7 +3,7 @@
 		request.setCharacterEncoding("EUC-KR");
 		int userNum=0;
 		if(session.getAttribute("userNum")!=null){
-		userNum=(Integer)session.getAttribute("userNum");
+			userNum=(Integer)session.getAttribute("userNum");
 		}
 %>
 <!DOCTYPE html>
@@ -37,9 +37,6 @@
         padding: 5px;
       }
     </style>
-    <script>
-    	
-    </script>
   </head>
   <body>
     <div id="page_bottom" onclick="openChatting('<%=userNum%>')"><img src="img/chat.svg" width="50px" />

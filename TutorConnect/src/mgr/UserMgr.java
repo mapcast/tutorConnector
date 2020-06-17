@@ -3,6 +3,9 @@ package mgr;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
+import javax.servlet.http.HttpServletRequest;
+
 import bean.UserBean;
 
 public class UserMgr {
@@ -76,6 +79,8 @@ public class UserMgr {
 				bean.setUserEmail(rs.getString(7));
 				bean.setUserBirth(rs.getString(8));
 				bean.setUserGender(rs.getString(9));
+				bean.setUserAddress2(rs.getString(10));
+				bean.setUserLastMessage(rs.getInt(11));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -93,7 +98,7 @@ public class UserMgr {
 		try {
 			con = pool.getConnection();
 			sql = "insert tbluser(userId, userPwd, userName, userAddress, userPhone, "
-					+ "userEmail, userBirth, userGender) values(?,?,?,?,?,?,?,?)";
+					+ "userEmail, userBirth, userGender, userAddress2) values(?,?,?,?,?,?,?,?,?)";
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, bean.getUserId());
 			pstmt.setString(2, bean.getUserPwd());
@@ -103,6 +108,7 @@ public class UserMgr {
 			pstmt.setString(6, bean.getUserEmail());
 			pstmt.setString(7, bean.getUserBirth());
 			pstmt.setString(8, bean.getUserGender());
+			pstmt.setString(9, bean.getUserAddress2());
 			if(pstmt.executeUpdate()==1) flag=true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -111,4 +117,174 @@ public class UserMgr {
 		}
 		return flag;
 	}
+	public boolean updateUser(HttpServletRequest request) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "update tbluser set userPwd=?, userName=?, userAddress=?, userPhone=?,"
+					+ " userEmail=?, userBirth=?, userGender=?, userAddress2=? where userNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, request.getParameter("userPwd"));
+			pstmt.setString(2, request.getParameter("userName"));
+			pstmt.setString(3, request.getParameter("userAddress"));
+			pstmt.setString(4, request.getParameter("userPhone"));
+			pstmt.setString(5, request.getParameter("userEmail"));
+			pstmt.setString(6, request.getParameter("userBirth"));
+			pstmt.setString(7, request.getParameter("userGender"));
+			pstmt.setString(8, request.getParameter("userAddress2"));
+			pstmt.setInt(9, Integer.parseInt(request.getParameter("userNum")));
+			if(pstmt.executeUpdate()==1) {
+				flag=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return flag;
+	}
+	public boolean isStudent(int userNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "select * from tblStudent where userNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				flag=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return flag;
+	}
+	public boolean isTeacher(int userNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "select * from tblTeacher where userNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				flag=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return flag;
+	}
+	public String findPwd(String userId, String userEmail) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		String pwd=null;
+		try {
+			con = pool.getConnection();
+			sql = "select userpwd from tbluser where userId=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, userId);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				pwd=rs.getString(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return pwd;
+	}
+	public void changePwd(String userId, String tempPwd) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		try {
+			con = pool.getConnection();
+			sql = "update tbluser set userPwd=? where userId=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, tempPwd);
+			pstmt.setString(2, userId);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+	}
+	public boolean checkPwd(int userNum, String userPwd) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "select * from tbluser where userNum=? and userPwd=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			pstmt.setString(2, userPwd);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				flag=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return flag;
+	}
+	public void deleteUser(int userNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "delete from tbluser where userNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+	}
+	public void updateUserLastMessage(int userNum, int userLastMessage) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		try {
+			con = pool.getConnection();
+			sql = "update tbluser set userlastmessage=? where userNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userLastMessage);
+			pstmt.setInt(2, userNum);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+	}
+	
 }

@@ -62,4 +62,91 @@ public class MessageMgr {
 			pool.freeConnection(con, pstmt);
 		}
 	}
+	public int countNotRead(int userNum, int opponentNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		int notRead=0;
+		try {
+			con = pool.getConnection();
+			sql = "select count(*) from tblMessage where fromNum=? and toNum=? and notRead=0";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, opponentNum);
+			pstmt.setInt(2, userNum);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				notRead=rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return notRead;
+	}
+	public void updateNotRead(int userNum, int opponentNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		try {
+			con = pool.getConnection();
+			sql = "update tblmessage set notRead=1 where fromNum=? and toNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, opponentNum);
+			pstmt.setInt(2, userNum);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+	}
+	public int getCurrentMsg(int userNum, int opponentNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		int currentMsgNum=0;
+		try {
+			con = pool.getConnection();
+			sql = "select max(num) from tblmessage where (fromNum=? or toNum=?) and (fromNum=? or toNum=?)";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			pstmt.setInt(2, userNum);
+			pstmt.setInt(3, opponentNum);
+			pstmt.setInt(4, opponentNum);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				currentMsgNum=rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return currentMsgNum;
+	}
+	public int getCurrentMsgByFooter(int userNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		int currentMsgNum=0;
+		try {
+			con = pool.getConnection();
+			sql = "select max(num) from tblmessage where toNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				currentMsgNum=rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return currentMsgNum;
+	}
 }

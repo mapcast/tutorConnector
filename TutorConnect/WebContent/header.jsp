@@ -231,22 +231,30 @@
         </div>
         <div class="pt_items">
           <%if(userNum==0){ %>
-          <a href="login.jsp">로그인</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="join.jsp">회원가입</a>
+          <a href="login.jsp">로그인</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="terms.html">회원가입</a>
           <%}else{ %>
-          <a href="mypage.jsp">마이페이지</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="logoutProc.jsp">로그아웃</a>
+          <a href="wishList.jsp">마이페이지</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="logoutProc.jsp">로그아웃</a>
           <%} %>
         </div>
       </div>
       <div id="ptb_menu">
-        <div class="ptb_items"><a href="#">선생님 찾기</a></div>
+        <div class="ptb_items"><a href="Tsearch.jsp">선생님 찾기</a></div>
         <div class="ptb_items"><a href="#">학생 찾기</a></div>
         <%if(userNum!=0){ %>
-        <div class="ptb_items"><a href="joinTeacher.jsp">선생님 등록</a></div>
+        	<%if(mgr.isTeacher(userNum)){ %>
+        	<div class="ptb_items"><a href="javascript:alreadyTeacher()">선생님 등록</a></div>
+        	<%}else{ %>
+        	<div class="ptb_items"><a href="joinTeacher.jsp">선생님 등록</a></div>
+        	<%} %>
         <%}else{ %>
         <div class="ptb_items"><a href="login.jsp">선생님 등록</a></div>
         <%} %>
         <%if(userNum!=0){ %>
-        <div class="ptb_items"><a href="joinStudent.jsp">학생 등록</a></div>
+        	<%if(mgr.isStudent(userNum)){ %>
+        	<div class="ptb_items"><a href="javascript:alreadyStudent()">학생 등록</a></div>
+        	<%}else{ %>
+        	<div class="ptb_items"><a href="joinStudent.jsp">학생 등록</a></div>
+        	<%} %>
         <%}else{ %>
         <div class="ptb_items"><a href="login.jsp">학생 등록</a></div>
         <%} %>

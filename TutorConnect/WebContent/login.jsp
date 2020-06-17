@@ -155,6 +155,9 @@
       rel="stylesheet"
     />
     <script>
+    function openFindPwd(){
+    	window.open("findPwd.html", "findPwd", "width=600, height=301, scrollbars=no, location=no, toobar=no, menubar=no");
+    }
     function inputCheck(){
 		if(document.loginpost.userId.value==""){
 			alert("아이디를 입력하세요!");
@@ -213,8 +216,8 @@
           </div>
         </form>
         <div id="bottomFlex">
-          <div class="bfItems"><a href="">회원가입</a></div>
-          <div class="bfItems"><a href="">ID/PW 찾기</a></div>
+          <div class="bfItems"><a href="terms.html">회원가입</a></div>
+          <div class="bfItems"><a href="javascript:openFindPwd()">PW 찾기</a></div>
         </div>
       </div>
     </div>

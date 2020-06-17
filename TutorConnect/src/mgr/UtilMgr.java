@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.io.File;
 import java.text.*;
 
 public class UtilMgr {
@@ -45,6 +46,12 @@ public class UtilMgr {
          String s = String.valueOf(i);
 		 return monFormat(s);		  
   }
+  public static void delete(String s) {
+		File file = new File(s);
+		if (file.isFile()) {
+			file.delete();
+		}
+	}
   
   //2009. 9. 28
   public static String getDay(){
