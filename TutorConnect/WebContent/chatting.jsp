@@ -11,8 +11,9 @@
 		request.setCharacterEncoding("EUC-KR");
 		int userNum=Integer.parseInt(request.getParameter("userNum"));
 		UserBean myInfo=umgr.getUser(userNum);
-		int userLastMessage=mmgr.getCurrentMsgByFooter(userNum);
-		umgr.updateUserLastMessage(userNum, userLastMessage);
+		/* int userLastMessage=mmgr.getCurrentMsgByFooter(userNum);
+		umgr.updateUserLastMessage(userNum, userLastMessage); */
+		//채팅 아이콘 반짝이는 효과를 페이지 이동시 사라지지 않게 하려고 넣었으나 돔 로드 이슈때문에 현재는 중단.
 		String ip=request.getRemoteAddr();
 		String myImg="";
 		int currentMsg=0;
@@ -23,9 +24,9 @@
 		int opponentNum=0;
 		String opponentImg="";
 		UserBean opponentInfo=new UserBean();
-		if(request.getParameter("opponentNum")!=null){
+		if(request.getParameter("opponentNum")!=null){//상대가 선택 되어있을때의 처리
 			opponentNum=Integer.parseInt(request.getParameter("opponentNum"));
-			mmgr.updateNotRead(userNum, opponentNum);
+			mmgr.updateNotRead(userNum, opponentNum);//읽지 않은 메시지 갱신
 			mList=mmgr.getMessage(userNum, opponentNum);
 			opponentInfo=umgr.getUser(opponentNum);
 			if(tmgr.getImage(opponentNum)!=null){
@@ -33,7 +34,7 @@
 			}
 			if(mmgr.getCurrentMsg(userNum, opponentNum)!=0){
 				currentMsg=mmgr.getCurrentMsg(userNum, opponentNum);
-			}
+			}//가장 최근의 메시지를 들고오는 처리. 채팅방 자동 갱신시에 사용된다.
 		}
 		Vector<Integer> oList=match.getOpponents(userNum);
 %>
@@ -292,11 +293,11 @@
       type="text/css"
     />
     <script>
-   		window.onload=function(){
+   		window.onload=function(){//하지 않으면 메뉴가 처음에 두번 클릭해야 나옴.
    			document.getElementById("menuContent").style.display="none";
    		}
    		var recentNum=<%=currentMsg%>
-        function loop() {
+        function loop() {//새로운 메시지가 있을때 클라이언트의 화면을 새로고침 시켜준다.
           var xhttp = new XMLHttpRequest();
           xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
@@ -310,12 +311,12 @@
           xhttp.open("GET", "messageToJson.jsp?userNum=<%=userNum%>&opponentNum=<%=opponentNum%>", true);
           xhttp.send();
         }
-        setInterval(loop, 1000);
-    	function selectOpponent(num){
+        setInterval(loop, 1000);//loop함수를 1초마다 반복.
+    	function selectOpponent(num){//상대를 선택했을때 실행되는 함수
     		document.opponentForm.opponentNum.value=num;
     		document.opponentForm.submit();
     	}
-    	function showMenus(){
+    	function showMenus(){//메뉴를 클릭시 껐다 킬수 있다
     		menu=document.getElementById("menuContent");
     		if(menu.style.display=="none"){
     			menu.style.display="block";
@@ -331,10 +332,7 @@
         <form method="get" name="opponentForm" action="chatting.jsp">
         	<input type="hidden" name="userNum" value="<%=userNum%>">
         	<input type="hidden" name="opponentNum" value="">
-        	<!-- <a href="javascript:selectOpponent(22)"><div class="opponentList">김범수님과의 채팅</div></a>
-	        <a href=""><div class="opponentList">박명수님과의 채팅</div></a>
-	        <a href=""><div class="opponentList">유재석님과의 채팅</div></a> -->
-	        <%for(int i=0; i<oList.size(); i++){ 
+	        <%for(int i=0; i<oList.size(); i++){ //상대 리스트 불러옴
 	        		int oNum=oList.get(i);
 	        		UserBean obean=umgr.getUser(oNum);
 	        		String oName=obean.getUserName();
@@ -342,21 +340,21 @@
 	        		if(tmgr.getImage(oNum)!=null){
 	        			oImg=tmgr.getImage(oNum);
 	        		}
-	        		int notRead=mmgr.countNotRead(userNum, oNum);
+	        		int notRead=mmgr.countNotRead(userNum, oNum);//상대가 나에게 보낸 메시지중 읽지 않은 개수를 불러오는 메서드.
 	        %>
 	        <a href="javascript:selectOpponent(<%=oNum%>)">
 		        <div class="opponentList">
 		        	<div class="opponentLeft">
-			        	<%if(oImg.equals("")){ %>
+			        	<%if(oImg.equals("")){ %><!-- 등록된 이미지가 없을때 -->
 			        	<img src="img/anonymous.jpg" class="smallCircleImage">
-			        	<%}else{ %>
+			        	<%}else{ %><!-- 있을때 -->
 			        	<img src="img/<%=oImg%>" class="smallCircleImage">
 			        	<%} %>
 			        	<div class="opponentName">
 			        		<%=oName%>님과의 채팅
 			        	</div>
 		        	</div>
-		        	<%if(notRead!=0){ %>
+		        	<%if(notRead!=0){ %><!-- 읽지않은 메시지가 존재하지 않을때 숫자를 표시하지 않음. -->
 		        	<div class="notRead"><%=notRead %></div>
 		        	<%} %>
 		        </div>
@@ -367,6 +365,7 @@
       <div id="chatDiv">
         <div id="messageDiv">
         <div id="menuContent">
+        <!-- 매칭 처리등에 사용되는 잡다한 폼들 -->
         <form method="post" name="matchForm" action="matchingProc.jsp">
 	      	<input type="hidden"  name="userNum" value="<%=userNum%>">
 	      	<input type="hidden" name="opponentNum" value="<%=opponentNum%>">
@@ -388,11 +387,11 @@
 	      	<input type="hidden" name="ip" value="<%=ip%>">
 	      	<input type="hidden" name="flags" value="sendMatch">
       	</form>
-            <%if(match.isMatched(userNum, opponentNum)){ %>
+            <%if(match.isMatched(userNum, opponentNum)){ %><!-- 매칭이 이미 된 상대 -->
             <div class="menuContents" onClick="alert('이미 매칭이 되어있는 상대입니다!!')">
               매칭 신청하기
             </div>
-            <%}else if(match.isDeclined(userNum, opponentNum)){ %>
+            <%}else if(match.isDeclined(userNum, opponentNum)){ %><!-- 매칭이 거절된상대 -->
             <div class="menuContents" onClick="alert('매칭을 거절한 상대입니다.')">
               매칭 신청하기
             </div>
@@ -405,7 +404,7 @@
               팔로우 취소
             </div>
           </div>
-          <%for(int i=0; i<mList.size(); i++){
+          <%for(int i=0; i<mList.size(); i++){//채팅목록 불러오기
 	        	  MessageBean bean=mList.get(i);
 	        	  if(bean.getFromNum()==userNum){//보낸 메시지
 	        	  %>
@@ -413,7 +412,7 @@
 		            <div class="mbox">
 		              <div class="name"><%=myInfo.getUserName()%></div>
 		              <div class="myChat" <%if(bean.getMessage().equals("Q&KJfRv09*CmjRKlPh1!")){ %>style="background-color: rgb(88, 193, 137)"<%} %>>
-		                <%if(bean.getMessage().equals("Q&KJfRv09*CmjRKlPh1!")){ %>
+		                <%if(bean.getMessage().equals("Q&KJfRv09*CmjRKlPh1!")){ %><!-- 매칭 메시지는 특정값이 tblMessage에 들어왔을때 보임. -->
 			                <%if(match.isMatched(userNum, opponentNum)){ %>
 			                매칭이 완료되었습니다! 축하드립니다!
 			                <%}else if(match.isDeclined(userNum, opponentNum)){ %>
@@ -495,7 +494,7 @@
     	        if ($('#im').val() == '') {
     	            alert('보낼 메시지를 입력해주세요!');
     	            return false;
-    	        }
+    	        }//아무것도 입력하지 않고 엔터를 누르면 alert가 발동.
     	    }); // end submit()
     	}); // end ready()
     	

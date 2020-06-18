@@ -279,9 +279,9 @@
     />
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script>
-    var recentNum=<%=currentMsg%>
-    var temp=0;
-    var flashflag=false;
+    <%-- var recentNum=<%=currentMsg%>
+    var temp=0; --%>
+    var flashflag=false;//채팅 아이콘 점멸을 위한 boolean 변수
     function flashChat(){
     	var chat=document.getElementById("page_bottom");
     	if(flashflag){
@@ -299,10 +299,11 @@
         if (this.readyState == 4 && this.status == 200) {
           var data = JSON.parse(this.responseText);
           console.log(data);
-          if(recentNum!=data.recentNum){
-        	  goFlash=setInterval(flashChat(), 1000);
+          if(recentNum!=data.recentNum){//AJAX를 통해 DB에서 받아온 데이터가 페이지를 로드할때 가져온 tblmessage 최대값과 다를때
+        	  goFlash=setInterval(flashChat(), 1000);//flashChat()메서드를 1초에 한번씩 실행한다
           }
           else{
+        	  clearInterval(checkMessage);
           }
           temp=data.recentNum;
         }
@@ -316,8 +317,8 @@
 		if(num==0){
 			alert("채팅 기능은 로그인 후 이용하실 수 있습니다.");
 		}else{
-			clearInterval(checkMessage)
-			document.getElementById("page_bottom").style.backgroundColor="red";
+			clearInterval(checkMessage);
+			document.getElementById("page_bottom").style.backgroundColor="red";//채팅 아이콘을 누를시 점멸이 멈춘다
 			url="chatting.jsp?userNum="+num;
 			window.open(url, "chat", "width=1000, height=601, scrollbars=no, location=no, toobar=no, menubar=no");
 			recentNum=temp;
@@ -329,6 +330,7 @@
 	function alreadyTeacher(){
 		alert("이미 선생님으로 등록되어 있습니다!");
 	}
+	//openChatting, alreadyStudent, alreadyTeacher는 헤더와  푸터를 쓰는 모든 화면에 들어감.
     </script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">
@@ -396,13 +398,13 @@
     <div id="contentWrap">
       <div id="mainSlider">
         <div id="slider-div">
-        <%if(userNum!=0){ %>
-        	<%if(mgr.isStudent(userNum)){ %>
+        <%if(userNum!=0){//세션이 존재할때 %>
+        	<%if(mgr.isStudent(userNum)){//학생등록이 되어있을때 %>
         	<a href="javascript:alreadyStudent()"><div class="slideContent" id="SC1"></div></a>
-        	<%}else{ %>
+        	<%}else{//세션이 존재하고 학생등록이 되어있지 않을때 %>
         	<a href="joinStudent.jsp"><div class="slideContent" id="SC1"></div></a>
         	<%} %>
-        <%}else{ %>
+        <%}else{//세션이 존재하지 않을때 %>
         <a href="login.jsp"><div class="slideContent" id="SC1"></div></a>
         <%} %>
          <%if(userNum!=0){ %>
