@@ -21,7 +21,9 @@
 				msg="리뷰 수정 성공";
 			}
 		}else if(flag.equals("write")){
-			
+			if(rmgr.insertReview(rbean)){
+				msg="리뷰 작성 성공";
+			}
 		}
 %>
 <script>

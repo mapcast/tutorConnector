@@ -185,6 +185,10 @@
       type="text/css"
     />
     <script>
+    if(<%=userNum%>==0){
+    	  alert("허용되지 않은 접근입니다.")
+    	  location.href="main.jsp";
+      }
     <%-- var recentNum=<%=currentMsg%>
     var temp=0;
     var flashflag=false;

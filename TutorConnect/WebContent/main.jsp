@@ -279,8 +279,8 @@
     />
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script>
-    <%-- var recentNum=<%=currentMsg%>
-    var temp=0; --%>
+    var recentNum=<%=currentMsg%>
+    var temp=0;
     var flashflag=false;//채팅 아이콘 점멸을 위한 boolean 변수
     function flashChat(){
     	var chat=document.getElementById("page_bottom");
@@ -303,7 +303,6 @@
         	  goFlash=setInterval(flashChat(), 1000);//flashChat()메서드를 1초에 한번씩 실행한다
           }
           else{
-        	  clearInterval(checkMessage);
           }
           temp=data.recentNum;
         }
@@ -311,8 +310,13 @@
       xhttp.open("GET", "getCurrentMsg.jsp?userNum=<%=userNum%>", true);
       xhttp.send();
     }
-    var checkMessage
+    var checkMessage;
 	checkMessage=setInterval(loop, 1000);
+<%-- 	var usm=<%=userLastMessage%>
+	if(recentNum!=usm){
+		goFlash=setInterval(flashChat(), 1000);
+	} --%> //버그로 인해 사용불가.
+	
     function openChatting(num){
 		if(num==0){
 			alert("채팅 기능은 로그인 후 이용하실 수 있습니다.");
@@ -500,7 +504,7 @@
       <div class="mainTitles">- 오늘의 추천 선생님 -</div>
       <div id="slider-div2">
       	<%for(int i=0; i<todayTeachers.size();i++){
-      		TeacherBean teacher=todayTeachers.get(i);
+      		TeacherBean teacher=todayTeachers.get(i);//랜덤한 9명의 선생님을 불러오는 메서드
       		UserBean tInfo=mgr.getUser(teacher.getUserNum());
       		String range="";
       		switch(teacher.gettRange()){
@@ -523,7 +527,7 @@
       			range="무관";
       			break;
       		}
-      		String area=teacher.gettArea1().substring(0,2);
+      		String area=teacher.gettArea1().substring(0,2);//ex)부산부산진구로 데이터가 들어간 경우 부산만 가져오기 위함.
       		%>
       	<div class="s2_content">
           <a href="">

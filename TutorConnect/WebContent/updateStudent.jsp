@@ -9,7 +9,7 @@
 		request.setCharacterEncoding("EUC-KR");
 		int userNum=0;
 		UserBean bean=new UserBean();
-		boolean isStudentFlag=true;
+		boolean isStudentFlag=true;//학생등록이 되어있지 않은사람 구분을 위해 만듬.
 		StudentBean sbean=new StudentBean();
 		String major1=null, major2=null, major3=null;
 		String area1=null, area2=null, area3=null;
@@ -23,7 +23,7 @@
 				major1=imgr.searchMajor(sbean.getsSubject1());
 				area1=sbean.getsArea1().substring(0,2);
 				street1=sbean.getsArea1().substring(2);
-				if(sbean.getsSubject2()!=null){
+				if(sbean.getsSubject2()!=null){//subject 2,3, area 2,3이 null값이 아닐때의 처리
 					major2=imgr.searchMajor(sbean.getsSubject2());
 				}
 				if(sbean.getsSubject3()!=null){
@@ -475,7 +475,7 @@
               <option value="제2외국어">제2외국어
               <option value="IT/컴퓨터">IT/컴퓨터
             </select>
-            <select class="smallSelect" name="sSubject1">
+            <select class="smallSelect" name="sSubject1"><!-- ss1설정에 따라서 변경된다. -->
               <option value="<%=sbean.getsSubject1()%>" selected><%=sbean.getsSubject1()%>
             </select>
              <a href="javascript:showSub2()" class="plusButton" id="pb1" >+</a>
@@ -692,7 +692,7 @@
     <div include-html="footer1.jsp"></div>
     <script>
       includeHTML();
-      function subjectChange1(){
+      function subjectChange1(){//db에서 major, area값을 통해 minor, street값을 불러오는 기능. ajax를 사용하면 간략화 가능
     		ss1=document.studentFrm.ss1.value;
     		if(ss1=="수학"){
     			document.studentFrm.sSubject1.options.length=0;

@@ -11,8 +11,8 @@
 		request.setCharacterEncoding("EUC-KR");
 		int userNum=Integer.parseInt(request.getParameter("userNum"));
 		UserBean myInfo=umgr.getUser(userNum);
-		/* int userLastMessage=mmgr.getCurrentMsgByFooter(userNum);
-		umgr.updateUserLastMessage(userNum, userLastMessage); */
+		int userLastMessage=mmgr.getCurrentMsgByFooter(userNum);
+		umgr.updateUserLastMessage(userNum, userLastMessage); 
 		//채팅 아이콘 반짝이는 효과를 페이지 이동시 사라지지 않게 하려고 넣었으나 돔 로드 이슈때문에 현재는 중단.
 		String ip=request.getRemoteAddr();
 		String myImg="";
@@ -47,7 +47,7 @@
     <title>Document</title>
     <script type="text/javascript" src="js/jquery-3.5.0.min.js"></script>
     <style>
-      * {
+            * {
         box-sizing: border-box;
       }
       html,
@@ -70,7 +70,7 @@
         overflow-x: hidden;
         overflow-y: scroll;
         scrollbar-width: none;
-        background-color:rgb(88, 223, 167); 
+        background-color:rgb(58, 163, 117); 
       }
       #listDiv::-webkit-scrollbar {
         display: none;
@@ -80,6 +80,7 @@
         height: 600px;
         background-color: white;
       }
+      /*팝업 메세지창 큰거*/
       #messageDiv {
         width: 700px;
         height: 550px;
@@ -95,19 +96,29 @@
       .opponentList {
         width: 100%;
         height: 60px;
-        background-color: rgb(118, 223, 167);
-        border-bottom: 4px solid rgb(58, 163, 117);
-        border-right: 2px solid rgb(58, 163, 117);
+		background-color: rgb(58, 163, 117);
         font-size: 18px;
-        color: #black;
-        font-weight: 800;
+        color: white;
         padding:5px;
         display:flex;
         justify-content:space-between;
       }
+      /*리스트 호버링 색*/
       .opponentList:hover {
-        background-color: rgb(58, 163, 117);
-        color: #666666;
+        background-color: white;
+        color: black;
+      }
+    .opponentList1 {
+        width: 100%;
+        height: 60px;
+		background-color: white;
+        font-size: 18px;
+        color: rgb(58, 163, 117);
+        padding:5px;
+        display:flex;
+        justify-content:space-between;
+        font-weight:bold;
+        border: 3px solid rgb(58, 163, 117);
       }
       .opponentLeft{
       display:flex;
@@ -130,6 +141,7 @@
         height: 50px;
         display:flex;
       }
+      /*타이핑*/
       #typingDiv {
         border: 5px solid rgb(58, 163, 117);
         width: 85%;
@@ -166,7 +178,7 @@
         min-height: 40px;
         height: auto;
         border-radius: 4px;
-        background-color: #EEEEEE;
+        background-color: rgb(240,244,248);
         padding: 10px;
         word-break:break-all;
       }
@@ -194,8 +206,11 @@
       .submitButton {
         width: 100%;
         height: 50px;
-        color: rgb(58, 163, 117);
+        color: white;
         font-weight: 800;
+        font-size:20px;
+        background:rgb(58, 163, 117);
+        border: 5px solid rgb(58, 163, 117);
       }
       .imageWrapOp{
       	padding:10px;
@@ -220,30 +235,33 @@
         background: rgb(58, 163, 117);
         width: 5%;
         height: 50px;
-        background-image: url("img/menu.svg");
+        background-image: url("img/menu3.svg");
         background-size: 30px;
         background-position: right;
         background-repeat: no-repeat;
+        border-left: 1px solid rgb(240,244,248);
         cursor: pointer;
       }
       #menuContent {
         position: fixed;
-        top: 425px;
+        top: 455px;
         left: 300px;
         width: 150px;
-        height: 130px;
+        height: 100px;
         padding: 5px;
         padding-left: 3px;
         background-color: rgb(58, 163, 117);
         border-radius: 4px 4px 0 0;
+        border-left: 1px solid rgb(240,244,248);
+        
       }
       .menuContents {
         width: 250;
-        height: 60px;
+        height: 40px;
         background-color: rgb(58, 163, 117);
         color: white;
         font-weight: 600;
-        padding: 15px 0;
+        padding: 8px 0;
         text-align: center;
         font-size: 18px;
         cursor: pointer;
@@ -251,6 +269,7 @@
       .menuContents:hover {
         background-color: rgb(78, 183, 137);
       }
+      
       .matchMessageDiv {
         text-align: center;
         width: 300px;
@@ -329,9 +348,20 @@
   <body>
     <div id="contentWrap">
       <div id="listDiv">
+      <div class="opponentList1">
+		        	<div class="opponentLeft">
+		        		<img src="img/class.png" class="smallCircleImage" style="width: 30px;height: 30px;margin: 10px;">
+			        	<div class="opponentName">
+			        			과외 커넥터 채팅 리스트
+			        	</div>
+		        	</div>
+		        </div>
         <form method="get" name="opponentForm" action="chatting.jsp">
         	<input type="hidden" name="userNum" value="<%=userNum%>">
         	<input type="hidden" name="opponentNum" value="">
+        	<%if(oList.size()==0){ %>
+        	채팅 상대가 없습니다.
+        	<%} %>
 	        <%for(int i=0; i<oList.size(); i++){ //상대 리스트 불러옴
 	        		int oNum=oList.get(i);
 	        		UserBean obean=umgr.getUser(oNum);
@@ -342,6 +372,7 @@
 	        		}
 	        		int notRead=mmgr.countNotRead(userNum, oNum);//상대가 나에게 보낸 메시지중 읽지 않은 개수를 불러오는 메서드.
 	        %>
+	        
 	        <a href="javascript:selectOpponent(<%=oNum%>)">
 		        <div class="opponentList">
 		        	<div class="opponentLeft">
@@ -411,6 +442,7 @@
 	        	  <div class="myBox" >
 		            <div class="mbox">
 		              <div class="name"><%=myInfo.getUserName()%></div>
+		              <!-- 자신이 적은 메시지 -->
 		              <div class="myChat" <%if(bean.getMessage().equals("Q&KJfRv09*CmjRKlPh1!")){ %>style="background-color: rgb(88, 193, 137)"<%} %>>
 		                <%if(bean.getMessage().equals("Q&KJfRv09*CmjRKlPh1!")){ %><!-- 매칭 메시지는 특정값이 tblMessage에 들어왔을때 보임. -->
 			                <%if(match.isMatched(userNum, opponentNum)){ %>
@@ -433,6 +465,7 @@
 		            	<%} %>
 		            </div>
 		          </div> 
+		          <!-- 상대가 적은 메시지 -->
 	        	<%}else if(bean.getToNum()==userNum){ %>
 	        	<div class="apponentBox">
 	        		<div class="imageWrapOp">
@@ -454,7 +487,7 @@
 			                <div class="matchMessageDiv">
 			                  <%=opponentInfo.getUserName()%>님이 매칭을 신청했습니다!
 			                </div>
-			                <div class="matchButtonDiv">
+			                <div class="matchButtonDiv"><!-- 상대가 보낸 매칭메시지의 경우 수락 거절 버튼이 표시된다. -->
 			                  <input type="button" class="matchDivButton" value="수락" onClick="document.matchForm.submit()" />
 			                  <input type="button" class="matchDivButton" value="거절" onClick="document.declineForm.submit()" />
 			                </div>
@@ -479,7 +512,7 @@
               <input type="text" class="inputMessage" id="im" name="message" value="" placeholder="메시지를 입력해주세요" autocomplete="off"/>
             </div>
             <div id="submitDiv">
-              <input type="button" class="submitButton" value="전송" />
+              <input type="button" class="submitButton" value="전송" onClick="chatform.submit()" />
             </div>
           </form>
         </div>

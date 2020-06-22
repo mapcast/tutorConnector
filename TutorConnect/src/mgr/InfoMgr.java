@@ -12,7 +12,7 @@ public class InfoMgr {
 	public InfoMgr() {
 		pool=DBConnectionMgr.getInstance();
 	}
-	public String searchMajor(String minor) {
+	public String searchMajor(String minor) {//minor를 통해 major를 불러옴. 수정페이지에서 과목 대분류를 가져올때 사용.
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -35,7 +35,7 @@ public class InfoMgr {
 		return major;
 	}
 	
-	public Vector<String> searchMath(){
+	public Vector<String> searchMath(){//search과목메소드는 사용하긴 했지만 하나로 단축할수 있었음. 
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -204,7 +204,7 @@ public class InfoMgr {
 		return minor;
 	}
 	
-	public Vector<String> searchByCity(String city){
+	public Vector<String> searchByCity(String city){//city를 통해 street를 검색함. 위 과목 검색도 이 구조로 했어야함.
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;

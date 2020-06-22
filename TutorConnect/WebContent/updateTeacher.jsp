@@ -11,6 +11,7 @@
 <% 
 	int userNum = 0;
 	UserBean bean = new UserBean();
+	boolean isTeacherFlag=true;
 	TeacherBean tbean = new TeacherBean();
 	String major1=null, major2=null, major3=null;
 	String area1=null, area2=null, area3=null;
@@ -19,24 +20,27 @@
 	if(session.getAttribute("userNum")!=null){
 		userNum=(Integer)session.getAttribute("userNum");
 		bean=mgr.getUser(userNum);
-		tbean=tmgr.getTeacherInfo(userNum);
-		major1=imgr.searchMajor(tbean.gettSubject1());
- 		area1=tbean.gettArea1().substring(0,2);
-		street1=tbean.gettArea1().substring(2);
-		if(tbean.gettSubject2()!=null){
-		major2=imgr.searchMajor(tbean.gettSubject2());
+		if(tmgr.isTeacher(userNum)){
+			tbean=tmgr.getTeacherInfo(userNum);
+			isTeacherFlag=false;
+			major1=imgr.searchMajor(tbean.gettSubject1());
+	 		area1=tbean.gettArea1().substring(0,2);
+			street1=tbean.gettArea1().substring(2);
+			if(tbean.gettSubject2()!=null){
+			major2=imgr.searchMajor(tbean.gettSubject2());
+			}
+			if(tbean.gettSubject3()!=null){
+				major3=imgr.searchMajor(tbean.gettSubject3());
+			}
+			if(tbean.gettArea2()!=null){
+				area2=tbean.gettArea2().substring(0,2);
+				street2=tbean.gettArea2().substring(2);
+			}
+			if(tbean.gettArea3()!=null){
+				area3=tbean.gettArea3().substring(0,2);
+				street3=tbean.gettArea3().substring(2);
+			} 
 		}
-		if(tbean.gettSubject3()!=null){
-			major3=imgr.searchMajor(tbean.gettSubject3());
-		}
-		if(tbean.gettArea2()!=null){
-			area2=tbean.gettArea2().substring(0,2);
-			street2=tbean.gettArea2().substring(2);
-		}
-		if(tbean.gettArea3()!=null){
-			area3=tbean.gettArea3().substring(0,2);
-			street3=tbean.gettArea3().substring(2);
-		} 
  	}
 	Vector<String> mathMinors=imgr.searchMath();
 	Vector<String> englishMinors=imgr.searchEnglish();
@@ -165,10 +169,6 @@
       }
       #myPageMenu2 {
         width: 200px;
-        height: 600px;
-      }
-      #myPageContents {
-        width: 900px;
         height: 600px;
       }
       
@@ -483,7 +483,10 @@ $(document).ready(function(){
           <div class="menus2"><a href="deleteUser.jsp">회원 탈퇴</a></div>
         </div>
         <div id="myPageContents">
-          <div id="myPageContent">
+        <%if(isTeacherFlag){ %>
+        선생 등록이 되어있지 않습니다.
+        <%}else{ %>
+        <div id="myPageContent">
             <form method="post" name="teacherFrm" action="TeacherUpdate" enctype="multipart/form-data">
            	<input type="hidden" name="userNum" value="<%=userNum%>">
         <div class="joinFlex">
@@ -802,7 +805,7 @@ $(document).ready(function(){
           
           <div class="joinFlex">
             <div class="inputDesc">자기소개</div>
-            <textarea name="tPR" cols="54" rows="10" value="<%=tbean.gettPR()%>"><%=tbean.gettPR()%></textarea>
+            <textarea style="resize: none;" name="tPR" cols="54" rows="10" value="<%=tbean.gettPR()%>"><%=tbean.gettPR()%></textarea>
           </div>
        <div class="joinFlex">
           <div class="inputDesc">정보공개여부</div>
@@ -823,7 +826,9 @@ $(document).ready(function(){
         </button>
       </div>
       
-   </div></div></div></div>
+   </div>
+        <%} %>
+          </div></div></div>
    <div include-html="footer.jsp"></div>
     <footer include-html="footer1.jsp"></footer>
     <script>

@@ -3,7 +3,7 @@ package mgr;
 import java.util.Random;
 
 public class MailSend {
-	public boolean sendPwd(String userId, String userEmail) {
+	public boolean sendPwd(String userId, String userEmail) {//임의의 10개 문자를 조합하여 패스워드를 생성하고 메일로 보내기
 		boolean flag=false;
 		UserMgr mgr=new UserMgr();
 		String pwd=mgr.findPwd(userId, userEmail);

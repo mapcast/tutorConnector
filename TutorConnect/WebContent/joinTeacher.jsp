@@ -667,7 +667,7 @@ enctype="multipart/form-data">
           
           <div class="joinFlex">
             <div class="inputDesc">자기소개</div>
-            <textarea name="tPR" cols="54" rows="10"></textarea>
+            <textarea style="resize:none;" name="tPR" cols="54" rows="10"></textarea>
           </div>
         <div class="joinFlex">
           <div class="inputDesc">정보공개여부</div>

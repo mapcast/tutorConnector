@@ -676,5 +676,28 @@ public class TeacherMgr {
 				file.delete();
 			}
 		}
+		public boolean isTeacher(int userNum) {
+			Connection con = null;
+			PreparedStatement pstmt = null;
+			ResultSet rs = null;
+			String sql = null;
+			boolean flag=false;
+			try {
+				con = pool.getConnection();
+				sql = "select userNum from tblteacher where userNum=?";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setInt(1, userNum);
+				rs = pstmt.executeQuery();
+				if(rs.next()) {
+					flag=true;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				pool.freeConnection(con, pstmt, rs);
+			}
+			return flag;
+
+		}
 
 }

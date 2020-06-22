@@ -12,7 +12,7 @@ public class MatchMgr {
 	public MatchMgr() {
 		pool=DBConnectionMgr.getInstance();
 	}
-	public Vector<Integer> getOpponents(int userNum){
+	public Vector<Integer> getOpponents(int userNum){//대화 상대 불러오기
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -41,7 +41,7 @@ public class MatchMgr {
 		}
 		return vlist;
 	}
-	public Vector<MatchBean> getMatches(int userNum){
+	public Vector<MatchBean> getMatches(int userNum){//match테이블에서 자신과의 관계가 있는 사람 불러오기
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -80,7 +80,7 @@ public class MatchMgr {
 			pool.freeConnection(con, pstmt);
 		}
 	}
-	public void matching(int userNum1, int userNum2) {
+	public void matching(int userNum1, int userNum2) {//업데이트가 아닌 삭제 후 생성하는 방식.
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
@@ -97,7 +97,7 @@ public class MatchMgr {
 			pool.freeConnection(con, pstmt);
 		}
 	}
-	public void decline(int userNum1, int userNum2) {
+	public void decline(int userNum1, int userNum2) {//거절당할시 tblmatch를의 grade를 2로 만듬
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
@@ -114,7 +114,7 @@ public class MatchMgr {
 			pool.freeConnection(con, pstmt);
 		}
 	}
-	public void matchCancle(int userNum1, int userNum2) {
+	public void matchCancle(int userNum1, int userNum2) {//메뉴에서 팔로우 취소를 누를시
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
@@ -131,7 +131,7 @@ public class MatchMgr {
 			pool.freeConnection(con, pstmt);
 		}
 	}
-	public boolean isMatched(int userNum, int opponentNum) {
+	public boolean isMatched(int userNum, int opponentNum) {//매치관계 검사
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -154,7 +154,7 @@ public class MatchMgr {
 		}
 		return flag;
 	}
-	public boolean isDeclined(int userNum, int opponentNum) {
+	public boolean isDeclined(int userNum, int opponentNum) {//거절된경우
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -176,5 +176,93 @@ public class MatchMgr {
 			pool.freeConnection(con, pstmt, rs);
 		}
 		return flag;
+	}
+	public Vector<Integer> getMatchedTeacher(int userNum){
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		Vector<Integer> vlist=new Vector<Integer>();
+		try {
+			con = pool.getConnection();
+			sql = "select m.followed from tblmatch m, tblteacher t where followed=userNum and follower=? order by m.grade desc";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				vlist.add(rs.getInt(1));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return vlist;
+	}
+	public int mtTotalCount(int userNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		int totalcount=0;
+		try {
+			con = pool.getConnection();
+			sql = "select count(*) from tblmatch, tblteacher where followed=userNum and follower=? ";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				totalcount=rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return totalcount;
+	}
+	public Vector<Integer> getMatchedStudent(int userNum){
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		Vector<Integer> vlist=new Vector<Integer>();
+		try {
+			con = pool.getConnection();
+			sql = "select m.followed from tblmatch m, tblstudent t where followed=userNum and follower=? order by m.grade";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				vlist.add(rs.getInt(1));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return vlist;
+	}
+	public int msTotalCount(int userNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		int totalcount=0;
+		try {
+			con = pool.getConnection();
+			sql = "select count(*) from tblmatch, tblstudent where followed=userNum and follower=? ";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				totalcount=rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return totalcount;
 	}
 }
