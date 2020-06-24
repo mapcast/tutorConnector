@@ -229,7 +229,7 @@ public class MatchMgr {
 		Vector<Integer> vlist=new Vector<Integer>();
 		try {
 			con = pool.getConnection();
-			sql = "select m.followed from tblmatch m, tblstudent t where followed=userNum and follower=? order by m.grade";
+			sql = "select m.followed from tblmatch m, tblstudent t where followed=userNum and follower=? order by m.grade desc";
 			pstmt = con.prepareStatement(sql);
 			pstmt.setInt(1, userNum);
 			rs = pstmt.executeQuery();

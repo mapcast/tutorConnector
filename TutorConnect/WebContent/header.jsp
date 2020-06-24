@@ -225,7 +225,7 @@
     </div>
     <div id="page_top">
       <div id="pt_menu">
-        <div class="pt_items"><a href="">고객센터</a></div>
+        <div class="pt_items"><a href="CS_QnA_List.jsp">고객센터</a></div>
         <div id="pt_logo">
           <a href="main.jsp"><img src="img/logo2.jpg" width="250px" /></a>
         </div>
@@ -239,7 +239,7 @@
       </div>
       <div id="ptb_menu">
         <div class="ptb_items"><a href="Tsearch.jsp">선생님 찾기</a></div>
-        <div class="ptb_items"><a href="#">학생 찾기</a></div>
+        <div class="ptb_items"><a href="Ssearch.jsp">학생 찾기</a></div>
         <%if(userNum!=0){ %>
         	<%if(mgr.isTeacher(userNum)){//이 파일을 인클루드 하는 페이지에서 펑션을 생성해줘야함. 아래에 있는것도 마찬가지. %>
         	<div class="ptb_items"><a href="javascript:alreadyTeacher()">선생님 등록</a></div>

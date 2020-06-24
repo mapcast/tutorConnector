@@ -1,21 +1,19 @@
-<%@page import="bean.UserBean"%>
-<%@page import="bean.TeacherBean"%>
 <%@page import="bean.SubjectBean"%>
+<%@page import="bean.TeacherBean"%>
+<%@page import="bean.StudentBean"%>
+<%@page import="bean.UserBean"%>
 <%@page import="mgr.UtilMgr"%>
 <%@page import="bean.AreaBean"%>
 <%@page import="java.util.Vector"%>
 <%@ page contentType="text/html; charset=EUC-KR"%>
-
 <%
 	request.setCharacterEncoding("EUC-KR");
-
-	String loc="contentWrap";
-	//세션값의 유저넘버
+	
 	int userNum=0;
 	if(session.getAttribute("userNum")!=null){
 		userNum=(Integer)session.getAttribute("userNum");
 	}
-		
+	
 	String area = "서울";
 	if(request.getParameter("area")!=null){
 		area = request.getParameter("area");
@@ -23,24 +21,22 @@
 	Vector<AreaBean> vlist;
 	Vector<SubjectBean> vlistsub;
 	
-	if(request.getParameter("loc")!=null){
-		loc = request.getParameter("loc");
-	}
+	//페이징 처리 시작
+	int totalRecord = 0;//총게시물수
+	int numPerPage = 10;//페이지당 레코드 개수(5,10,15,30)
+	int pagePerBlock = 5;//블럭당 페이지 개수
+	int totalPage = 0;//총 페이지 개수
+	int totalBlock = 0;//총 블럭 개수
+	int nowPage = 1;//현재 페이지
+	int nowBlock = 1;//현재 블럭
 	
-
-
- 	int totalRecord = 0;//총게시물수
- 	int numPerPage = 10;//페이지당 레코드 개수(5,10,15,30)
- 	int pagePerBlock = 5;//블럭당 페이지 개수
- 	int totalPage = 0;//총 페이지 개수
- 	int totalBlock = 0;//총 블럭 개수
- 	int nowPage = 1;//현재 페이지
- 	int nowBlock = 1;//현재 블럭
- 	
- 	//검색에 필요한 변수
- 	String keyWord = "";
-
+	//검색에 필요한 변수
+	String keyWord = "";
+	
+	int StudentNum;
+	
 %>
+<jsp:useBean id="sMgr" class="mgr.StudentMgr"/>
 <jsp:useBean id="tMgr" class="mgr.TsearchMgr"/>
 <jsp:useBean id="tmgr" class="mgr.TeacherListMgr"/>
 
@@ -50,42 +46,6 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <script type="text/javascript">   
-    //페이징 처리 시작
-      function listin() {
-
-  		document.listFrm.action = "Tsearch.jsp?loc=tlist";
-  		document.listFrm.submit();
-
-      }
-      function check() {
-			if(document.searchFrm.keyWord.value==""){
-				alert("검색어를 입력하세요.");
-				document.searchFrm.keyWord.focus();
-				return;
-			}
-			document.searchFrm.submit();
-		}
-      function pageing(page) {
-			document.readFrm.nowPage.value = page;
-			document.readFrm.submit();
-		}
-      function block(block) {
-			document.readFrm.nowPage.value = <%=pagePerBlock%>*(block-1)+1;
-			document.readFrm.submit();
-		}
-      function reset(){
-    	  
-    	  
-      }
-      function alreadyStudent(){
-  		alert("이미 학생으로 등록되어 있습니다!");
-  	}
-  	function alreadyTeacher(){
-  		alert("이미 선생님으로 등록되어 있습니다!");
-  	}
-    //페이징 처리 끝
-    </script>
     <script src="js/includeHTML.js"></script>
     <script src="js/area.js"></script>
     <script src="js/subject.js"></script>
@@ -93,6 +53,7 @@
     <script type="text/javascript" src="js/jquery-3.5.0.min.js"></script>
     <link href="css/Tsearch.css" rel="stylesheet"/>
     <style>
+   <style>
       * {
         box-sizing: border-box;
       }
@@ -109,7 +70,7 @@
 	.search{/*바깥 큰 테두리*/
 		border: 1px solid grey;
 		background-color: white;
-		height: 712px;
+		height: 635px;
 	}
 	td {
 		font-size: 15px;
@@ -329,7 +290,6 @@
 	margin: 0px 3px;
 
 }
-
     </style>
     <script type="text/javascript">
     function value_check(city) {
@@ -361,8 +321,35 @@
         var a = f.subjectbtn.value;
         f.subjectbtn.value = a.substr(0,a.length-1);
     }
-
     
+    //페이징 처리 시작
+    function listin() {
+
+		document.listFrm.action = "Ssearch.jsp?loc=slist";
+		document.listFrm.submit();
+
+    }
+    
+    function check() {
+			if(document.searchFrm.keyWord.value==""){
+				alert("검색어를 입력하세요.");
+				document.searchFrm.keyWord.focus();
+				return;
+			}
+			document.searchFrm.submit();
+		}
+    function pageing(page) {
+			document.readFrm.nowPage.value = page;
+			document.readFrm.submit();
+		}
+    function block(block) {
+			document.readFrm.nowPage.value = <%=pagePerBlock%>*(block-1)+1;
+			document.readFrm.submit();
+		}
+    function reset(){
+  	  
+  	  
+    }
     function inputCheck(){
 		form=document.frm;
 		
@@ -392,35 +379,23 @@
 			form.submit();
 		}
 	}
-    
-    
-    function inputCheck2(){
-		form=document.frm;
-		
-		var a = document.getElementsByName("subject").length;
-
-        for (var i=0; i<a; i++) {
-            if (document.getElementsByName("subject")[i].checked == true) {
-            	form.submit();
-            	return;
-            }
-        }
-        alert("을 선택해주세요.");
-	}
-    function searchStudent(){
-    	location.href="Ssearch.jsp";
-    }
+    function alreadyStudent(){
+  		alert("이미 학생으로 등록되어 있습니다!");
+  	}
+  	function alreadyTeacher(){
+  		alert("이미 선생님으로 등록되어 있습니다!");
+  	}
     </script>
   </head>
   <body>
     <header include-html="header.jsp"></header>
     <div id="contentWrap">
-        <h2>선생님 찾기</h2>
+        <h2>학생 찾기</h2>
     	<div id='searchv' class="search">
-    	<div id ='area' class="area" >
-  <form action="Tsearch.jsp" name="frm">
-    	<!-- 지역 검색창 시작 -->
-    		<table>
+    	<div id="area" class="area">
+    	<form method="get" action="Ssearch.jsp" name="frm">
+<!-- 지역 검색창 시작 -->
+   		<table>
     		    <tr>
     				<td class="tdcitytitle"><h3>지역</h3></td>
     				<td colspan="8"><input name="btn" size="130" style="border-radius: 5px;" readonly></td>
@@ -430,29 +405,28 @@
  	    <!-- 지역 시 리스트 시작 -->
     		<table class="tablecity" style="margin : 0px 15px;">
     			<tr>		
-	    			<td class="tdcity" id="seoul1" value='3' onclick="findarea(seoul,seoul1);" style="background-color: rgb(88, 193, 137); color:white;">서울</td>				
-	    			<td class="tdcity" id="pusan1" onclick="findarea(pusan,pusan1);">부산</td>				
-	    			<td class="tdcity" id="deagu1" onclick="findarea(deagu,deagu1);">대구</td>				
-	    			<td class="tdcity" id="incheon1" onclick="findarea(incheon,incheon1);">인천</td>				
-	    			<td class="tdcity" id="gwangju1" onclick="findarea(gwangju,gwangju1);">광주</td>				
-	    			<td class="tdcity" id="daejeon1" onclick="findarea(daejeon,daejeon1);">대전</td>				
-	    			<td class="tdcity" id="ulsan1" onclick="findarea(ulsan,ulsan1);">울산</td>				
-	    			<td class="tdcity" id="sejong1" onclick="findarea(sejong,sejong1);">세종</td>				
-	    			<td class="tdcity" id="gyeonggi1" onclick="findarea(gyeonggi,gyeonggi1);">경기</td>				
+	    			<td class="tdcity" id="seoul1" value='3' onclick="findareas(seoul,seoul1);" style="background-color: rgb(88, 193, 137); color:white;">서울</td>				
+	    			<td class="tdcity" id="pusan1" onclick="findareas(pusan,pusan1);">부산</td>				
+	    			<td class="tdcity" id="deagu1" onclick="findareas(deagu,deagu1);">대구</td>				
+	    			<td class="tdcity" id="incheon1" onclick="findareas(incheon,incheon1);">인천</td>				
+	    			<td class="tdcity" id="gwangju1" onclick="findareas(gwangju,gwangju1);">광주</td>				
+	    			<td class="tdcity" id="daejeon1" onclick="findareas(daejeon,daejeon1);">대전</td>				
+	    			<td class="tdcity" id="ulsan1" onclick="findareas(ulsan,ulsan1);">울산</td>				
+	    			<td class="tdcity" id="sejong1" onclick="findareas(sejong,sejong1);">세종</td>				
+	    			<td class="tdcity" id="gyeonggi1" onclick="findareas(gyeonggi,gyeonggi1);">경기</td>				
     			</tr>
     			<tr>		
-	    			<td class="tdcity" id="gangwon1" onclick="findarea(gangwon,gangwon1);">강원</td>				
-	    			<td class="tdcity" id="chungb1" onclick="findarea(chungb,chungb1);">충북</td>				
-	    			<td class="tdcity" id="chungn1" onclick="findarea(chungn,chungn1);">충남</td>				
-	    			<td class="tdcity" id="jeollab1" onclick="findarea(jeollab,jeollab1);">전북</td>				
-	    			<td class="tdcity" id="jeollan1" onclick="findarea(jeollan,jeollan1);">전남</td>				
-	    			<td class="tdcity" id="gyeongb1" onclick="findarea(gyeongb,gyeongb1);">경북</td>				
-	    			<td class="tdcity" id="gyeongn1" onclick="findarea(gyeongn,gyeongn1);">경남</td>				
-	    			<td class="tdcity" id="jeju1" onclick="findarea(jeju,jeju1);">제주</td>				
-	    			<td class="tdcity" id="abroad1" onclick="findarea(abroad,abroad1);">해외</td>	
+	    			<td class="tdcity" id="gangwon1" onclick="findareas(gangwon,gangwon1);">강원</td>				
+	    			<td class="tdcity" id="chungb1" onclick="findareas(chungb,chungb1);">충북</td>				
+	    			<td class="tdcity" id="chungn1" onclick="findareas(chungn,chungn1);">충남</td>				
+	    			<td class="tdcity" id="jeollab1" onclick="findareas(jeollab,jeollab1);">전북</td>				
+	    			<td class="tdcity" id="jeollan1" onclick="findareas(jeollan,jeollan1);">전남</td>				
+	    			<td class="tdcity" id="gyeongb1" onclick="findareas(gyeongb,gyeongb1);">경북</td>				
+	    			<td class="tdcity" id="gyeongn1" onclick="findareas(gyeongn,gyeongn1);">경남</td>				
+	    			<td class="tdcity" id="jeju1" onclick="findareas(jeju,jeju1);">제주</td>				
+	    			<td class="tdcity" id="abroad1" onclick="findareas(abroad,abroad1);">해외</td>	
   			</tr>    			
     		</table>
-<!-- 지역 시 리스트 끝 -->
 <!-- 지역 구 리스트 시작 (서울) -->
  	    <div id="seoul" style="display:block;">
     		<table class="tablecity" style="background-color:white;border-collapse:collapse;margin : 0px 15px;display:block;padding-bottom: 0px">
@@ -462,7 +436,7 @@
 									int no = vlist.size();
 									int div = (int)Math.ceil((double)no/11);
 									int j = 0;
-									int start = 0;
+									int start;
 									int end = 0;
 									int startcity = 0;
 									if(no <=11){
@@ -593,10 +567,10 @@
 	    				<td class="tdcity" style="text-align: left;"><%=bean.getStreet()%></td>				
 	    				<%
 					    					}//for
-	    					if(j==11&div==2){//부산
-	    						startcity = 11;
-	    						end = no;
-	    					}
+							if(j==11&div==2){//부산
+								startcity = 11;
+								end = no;
+							}
 					    				%>
 						</tr>	
 	    			<%
@@ -1214,16 +1188,16 @@
     		</table>
     		<table class="tablecity" style="margin : 0px 15px;">
     			<tr>
- 		   			<td class="tdcity" id="math1"  onclick="findsubject(math,math1);" style="background-color: rgb(88, 193, 137); color:white;">수학</td>				
-	    			<td class="tdcity" id="english1" onclick="findsubject(english,english1);">영어</td>				
-	    			<td class="tdcity" id="korean1" onclick="findsubject(korean,korean1);">국어</td>				
-    				<td class="tdcity" id="science1" onclick="findsubject(science,science1);" >과학</td>					
+ 		   			<td class="tdcity" id="math1"  onclick="findsubjects(math,math1);" style="background-color: rgb(88, 193, 137); color:white;">수학</td>				
+	    			<td class="tdcity" id="english1" onclick="findsubjects(english,english1);">영어</td>				
+	    			<td class="tdcity" id="korean1" onclick="findsubjects(korean,korean1);">국어</td>				
+    				<td class="tdcity" id="science1" onclick="findsubjects(science,science1);" >과학</td>					
     			</tr>
     			<tr>
- 		   			<td class="tdcity" id="society1" onclick="findsubject(society,society1);">사회</td>				
-	    			<td class="tdcity" id="test1" onclick="findsubject(test,test1);">공인인증</td>				
-	    			<td class="tdcity" id="foreign1" onclick="findsubject(foreign,foreign1);">제2외국어</td>				
-    				<td class="tdcity" id="it1" onclick="findsubject(it,it1);">IT/컴퓨터</td>					
+ 		   			<td class="tdcity" id="society1" onclick="findsubjects(society,society1);">사회</td>				
+	    			<td class="tdcity" id="test1" onclick="findsubjects(test,test1);">공인인증</td>				
+	    			<td class="tdcity" id="foreign1" onclick="findsubjects(foreign,foreign1);">제2외국어</td>				
+    				<td class="tdcity" id="it1" onclick="findsubjects(it,it1);">IT/컴퓨터</td>					
     			</tr>
     		</table>
 <!-- 수학 시작 -->
@@ -1251,8 +1225,7 @@
 	    					if(j==3&div==2){
 	    						startcity = 3;
 	    						end = no;
-	    					}
-	    					%>
+	    					}%>
 						</tr>	
 	    			<%}//for %>
     				</table>
@@ -1510,58 +1483,17 @@
  				<br>   				
     </div>
 <!-- 시험 끝 -->
-	<div style="background-color: white;height: 10px;">
-	<br> &nbsp;
+	<div style="background-color: white">
+	<br> 
 	</div>
-
-<!-- 희망횟수 시작-->			
-	    <div class="tday" style="float : left;margin:0px;">
-    			<table>
-    		    <tr>
-    				<td class="tdcitytitle"><h3>희망횟수</h3></td>
-    				<td colspan="8"><input size="50" name='dbtn' style="border-radius: 5px;"value="협의" readonly></td>
-    			</tr>
-    		</table>
-    		<table class="tablecity" style="margin : 0px 15px;">
-    			<tr>
- 		   			<td class="tdcity" id='ju2' onclick="tday('ju2');">주2회</td>				
- 		   			<td class="tdcity" id='ju3' onclick="tday('ju3');">주3회</td>
- 		   			<td class="tdcity" id='ju5' onclick="tday('ju5');">주5회</td>				
- 		   			<td class="tdcity" id='jua' onclick="tday('jua');" style="background-color: rgb(88, 193, 137); color:white;">협의</td>				 		   						
-				</tr>
-    		</table>
-		</div>
-<!-- 희망횟수 끝-->
-
-	<div style="background-color: white;height: 103px;">
-	<br> &nbsp;
-	</div>
-	
-<!-- 성별 시작-->			
-		<div class="tGender" style="float : left;margin:0px;">
-     			<table>
-    		    <tr>
-    				<td class="tdcitytitle"><h3>성별</h3></td>
-    				<td colspan="8"><input size="50" name='gbtn'  style="border-radius: 5px;" value="전체" readonly></td>
-    			</tr>
-    		</table>
-    		<table class="tablecity" style="margin : 0px 15px;">
-    			<tr>
- 		   			<td class="tdcity" id='man' onclick="tGender('man');">남자</td>				
-	    			<td class="tdcity" id='woman' onclick="tGender('woman');">여자</td>				
-	    			<td class="tdcity" id='human' onclick="tGender('human');" style="background-color: rgb(88, 193, 137); color:white;">전체</td>				
-    			</tr>  			
-    		</table>
-			</div>
-<!-- 성별 끝-->
 </div>
-		
+<!-- 과목 끝-->
 <!-- 과외 금액 시작-->	
-	<div id="tfee" class="tfee" style="float :right;">
+	<div id="tfee" class="tfee">
     	 <table>
     	    <tr>
-    			<td class="tdcitytitle" ><h3>과외비</h3></td>
-    			<td colspan="8"><input size="50" name='fbtn' style="border-radius: 5px;" value="협의" readonly></td>
+    			<td class="tdcitytitle"><h3>과외비</h3></td>
+    			<td colspan="8"><input size="50" name='fbtn' style="border-radius: 5px;" value="협의" readonly="readonly"></td>
     		</tr>
     	</table>
     	<table class="tablecity" style="margin : 0px 15px;">
@@ -1580,63 +1512,43 @@
 <!-- 과외 금액 시작-->
 <!-- 과외 시간 시작-->
 	    	<div id="ttime1" class="ttime">
-    			<table>
+     			<table>
     		    <tr>
-    				<td class="tdcitytitle"><h3>과외시간</h3></td>
-    				<td colspan="8"><input size="50" name='tbtn' style="border-radius: 5px;"value="시간무관" readonly></td>
+    				<td class="tdcitytitle"><h3>성별</h3></td>
+    				<td colspan="8"><input size="50" name='gbtn'  style="border-radius: 5px;" value="전체" readonly="readonly"></td>
     			</tr>
     		</table>
     		<table class="tablecity" style="margin : 0px 15px;">
     			<tr>
- 		   			<td class="tdcity" id='tmornig' onclick="ttime('tmornig');">오전</td>				
-	    			<td class="tdcity" id='tafternoon' onclick="ttime('tafternoon');">오후</td>				
-	    			<td class="tdcity" id='tevening' onclick="ttime('tevening');">저녁</td>
-	    			<td class="tdcity" id='tall' onclick="ttime('tall');" style="background-color: rgb(88, 193, 137); color:white;">시간무관</td>			
+ 		   			<td class="tdcity" id='man' onclick="tGender('man');">남자</td>				
+	    			<td class="tdcity" id='woman' onclick="tGender('woman');">여자</td>				
+	    			<td class="tdcity" id='human' onclick="tGender('human');" style="background-color: rgb(88, 193, 137); color:white;">전체</td>				
     			</tr>  			
     		</table>
 			</div>
 <!-- 과외 시간 끝-->
-<!-- 교습 대상 시작-->			
+<!-- 희망횟수 시작-->			
 	    <div id="ttime2" class="ttime">
     			<table>
     		    <tr>
-    				<td class="tdcitytitle"><h3>교습대상</h3></td>
-    				<td colspan="8"><input size="50" name="tobj" style="border-radius: 5px;"value="전체" readonly></td>
+    				<td class="tdcitytitle"><h3>희망일</h3></td>
+    				<td colspan="8"><input size="50" name='dbtn' style="border-radius: 5px;"value="협의" readonly="readonly"></td>
     			</tr>
     		</table>
     		<table class="tablecity" style="margin : 0px 15px;">
     			<tr>
- 		   			<td class="tdcity" id='obj1' onclick="tobj('obj1');">초등학생</td>				
-	    			<td class="tdcity" id='obj2' onclick="tobj('obj2');">중학생</td>				
-	    			<td class="tdcity" id='obj3' onclick="tobj('obj3');">고등학생</td>				
-    			</tr>
-    			<tr>		
-	    			<td class="tdcity" id='obj4' onclick="tobj('obj4');">대학생</td>				
-	    			<td class="tdcity" id='obj5' onclick="tobj('obj5');">성인</td>				
-    				<td class="tdcity" id='obj6' onclick="tobj('obj6');" style="background-color: rgb(88, 193, 137); color:white;">전체</td>		
-    			</tr>    			
-    		</table>
-			</div>
-<!-- 교습 대상 끝-->
-
-<!-- 연령대 시작-->			
-	    <div id="tAge" class="tAge">
-    			<table>
-    		    <tr>
-    				<td class="tdcitytitle" style="width: 150px;text-align: left;"><h3 style="text-align: left;">연령대</h3></td>
-    				<td><input size="10" name="Astart" style="border-radius: 5px;text-align: center;" value="20"></td>
-    				<td>세 ~</td>
-    				<td><input size="10" name="Aend" style="border-radius: 5px;text-align: center;" value="80"></td>
-    				<td>세</td>
-    			</tr>
+ 		   			<td class="tdcity" id='ju2' onclick="tday('ju2');">주2회</a></td>				
+ 		   			<td class="tdcity" id='ju3' onclick="tday('ju3');">주3회</td>
+ 		   			<td class="tdcity" id='ju5' onclick="tday('ju5');">주5회</td>				
+ 		   			<td class="tdcity" id='jua' onclick="tday('jua');" style="background-color: rgb(88, 193, 137); color:white;">협의</td>				 		   						
+				</tr>
     		</table>
 		</div>
-	</div>
-	<!-- search -->
-<!-- 연령대 끝-->
-</form>
-
-<!-- style="display: flex; -->
+<!-- 희망횟수 끝-->
+  </form>
+	    </div><!-- search -->
+	    
+  <!-- 버튼 시작 -->	    
 	    <div style="display: flex;justify-content:flex-end;margin-top: 15px;">
 		    <div>
 		 			<input type="hidden" name="loc" value="tlist"/>
@@ -1646,478 +1558,12 @@
 		     		<input style="margin-left: 450px;" type="reset" value="초기화" onclick="reset()"/>	
 		    </div>
     	</div>
-    	
   <!-- 버튼 끝 -->
-    <!--닉네임으로 검색 Start-->
-    <div class="nickShearch" style="display:none;">
-      <h3 style="text-align: left;padding: 10px;">선생님 닉네임으로 검색</h3>
-      	<table>
-      		<tr>
-	      		<td>
-	      			<input class="nickShearch" type="text" value="" placeholder=" 검색할 선생님의 닉네임을 입력해주세요."/>
-	      		</td>
-	      		<td>
-	      			<input type="submit" value="검색" class='MemberButton'/>
-	      		</td>
-      		</tr>
-      	</table>
-    </div>
-     
-    <!--닉네임으로 검색 End-->
+
+
     <br />
-    <!--포토리스트 Start-->
-<%  Vector<TeacherBean> tpvlist = tMgr.TphotoList();
-			
-			int grade = 0;
-			TeacherBean bean;
-			
-			bean = tpvlist.get(0);
-			
-			grade = bean.gettRange();
-			String tgrade = "교습대상 | ";
-			if(grade==1){tgrade += "초등학생";}
-			else if(grade==2){tgrade += "중학생";}
-			else if(grade==3){tgrade += "고등학생";}
-			else if(grade==4){tgrade += "대학생";}
-			else if(grade==5){tgrade += "성인";}
-			else if(grade==6){tgrade += "전체";}
-			
-			int teacherNum = bean.getUserNum();
+    <!--리스트 Start-->
 
-
-%>
-    <div class="photolist" style="width: 100%; height: 400px;">
-	      <div style="background-color: rgb(149, 227, 187); border-color: rgb(88, 193, 137); float: left; width: 32%; margin-right: 2%; ">
-		<!-- 리뷰1 시작 -->
-			<a href="Tpage.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>">			 				
-				
-			      <div class="review">
-		            <div class="reviews">
-
-		                <img src="img/<%=bean.gettImage()%>" width="100%" height="100%" />
-			
-		                <div class="reviewDesc">
-		          		
-				              <div class="s2i_content">
-				                <div class="s2i_name"><b><%=bean.gettNickname() %></b></div>
-				    <!-- 최고선생님 이런거 붙이는곳 -->
-				    			<div class="tag">
-				    			<!-- 매칭률 높음 -->
-            						<div class="tag1" >우수 선생님</div>
-				                <!-- 동영상 등록여부 -->	
-				                	<div class="tag2" style="display:none;">동영상공개</div>
-				                <!-- 댓글여부 -->	
-				                	<div class="tag3">학생추천</div>
-				                </div>
-				                
-				            <!-- 학교, 전공 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/study.png" width="24px" /></div>					                  
-					                  <div class="s2i_desc"><%=bean.gettRecord() %></div>
-				                </div>
-				                
-				             <!-- 희망 과목 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/class.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=bean.gettSubject1() +","+ bean.gettSubject2() +","+bean.gettSubject3() %></div>      
-				                </div>
-				                
-				             <!-- 교습 대상 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/range.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=tgrade%></div>
-				                </div>
-				                
-				             <!-- 희망 지역 -->
-				                <div class="s2i_profile">
-				                  <div class="s2i_svg"><img src="img/location.png" width="24px" /></div>
-				                  <div class="s2i_desc"><%=bean.gettArea1() +","+ bean.gettArea2() +","+ bean.gettArea3()%></div>
-				                </div>
-				              
-				              </div>
-				              <!-- s2i_content 끝 -->
-		                </div>
-		                <!-- reviewDesc 끝-->
-		            </div>
-		            <!-- reviews 끝 -->
-		          </div>
-		          <!-- review 끝 -->
-		          </a>
-		       <!-- 리뷰1 끝 -->
-	      </div>
-	      <%
-	      
-	      bean = tpvlist.get(1);
-	      
-			grade = bean.gettRange();
-			tgrade = "교습대상 | ";
-			if(grade==1){tgrade += "초등학생";}
-			else if(grade==2){tgrade += "중학생";}
-			else if(grade==3){tgrade += "고등학생";}
-			else if(grade==4){tgrade += "대학생";}
-			else if(grade==5){tgrade += "성인";}
-			else if(grade==6){tgrade += "전체";}
-			
-			teacherNum = bean.getUserNum();
-
-			
-	      %>
-	      <div style=" background-color: rgb(232, 232, 232);border-color: rgb(224, 224, 224);float: left;width: 32%;">
-		<!-- 리뷰2 시작 -->
-				<a href="Tpage.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>">			 								
-			       <div class="review">
-		            <div class="reviews">
-
-		                <img src="img/<%=bean.gettImage()%>" width="100%" height="100%" />
-			
-		                <div class="reviewDesc">
-		          		
-				              <div class="s2i_content">
-				                <div class="s2i_name"><b><%=bean.gettNickname()%></b></div>
-				    <!-- 최고선생님 이런거 붙이는곳 -->
-				    			<div class="tag">
-				    			<!-- 매칭률 높음 -->
-            						<div class="tag1" style="display:none;">우수 선생님</div>
-				                <!-- 동영상 등록여부 -->	
-				                	<div class="tag2" style="display:none;">동영상공개</div>
-				                <!-- 댓글여부 -->	
-				                	<div class="tag3" style="display:none;">학생추천</div>
-				                </div>
-				                
-				            <!-- 학교, 전공 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/study.png" width="24px" /></div>					                  
-					                  <div class="s2i_desc"><%=bean.gettRecord() %></div>
-				                </div>
-				                
-				             <!-- 희망 과목 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/class.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=bean.gettSubject1() +","+ bean.gettSubject2() +","+bean.gettSubject3() %></div>      
-				                </div>
-				                
-				             <!-- 교습 대상 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/range.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=tgrade%></div>
-				                </div>
-				             <!-- 희망 지역 -->
-				                <div class="s2i_profile">
-				                  <div class="s2i_svg"><img src="img/location.png" width="24px" /></div>
-				                  <div class="s2i_desc"><%=bean.gettArea1() +","+ bean.gettArea2() +","+ bean.gettArea3()%></div>
-				                </div>
-				              
-				              </div>
-				              <!-- s2i_content 끝 -->
-		                </div>
-		                <!-- reviewDesc 끝-->
-		            </div>
-		            <!-- reviews 끝 -->
-		          </div>
-		          <!-- review 끝 -->
-		          </a>
-		       <!-- 리뷰2 끝 -->
-	      </div>
-	      
-<%
-	      
-	      bean = tpvlist.get(2);
-	      
-			grade = bean.gettRange();
-			tgrade = "교습대상 | ";
-			if(grade==1){tgrade += "초등학생";}
-			else if(grade==2){tgrade += "중학생";}
-			else if(grade==3){tgrade += "고등학생";}
-			else if(grade==4){tgrade += "대학생";}
-			else if(grade==5){tgrade += "성인";}
-			else if(grade==6){tgrade += "전체";}
-			
-			teacherNum = bean.getUserNum();
-
-			
-	      %>
-	      <div style="background-color: rgb(149, 227, 187);border-color: rgb(88, 193, 137);float: left;width: 32%;margin-left: 2%;">
-				<!-- 리뷰3 시작 -->
-					<a href="Tpage.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>">			 				
-					
-				 <div class="review">
-		            <div class="reviews">
-
-		                <img src="img/<%=bean.gettImage()%>" width="100%" height="100%" />
-			
-		                <div class="reviewDesc">
-		          		
-				              <div class="s2i_content">
-				                <div class="s2i_name"><b><%=bean.gettNickname() %></b></div>
-				    <!-- 최고선생님 이런거 붙이는곳 -->
-				    			<div class="tag">
-				    			<!-- 매칭률 높음 -->
-            						<div class="tag1" style="display:none;">우수 선생님</div>
-				                <!-- 동영상 등록여부 -->	
-				                	<div class="tag2" style="display:none;">동영상공개</div>
-				                <!-- 댓글여부 -->	
-				                	<div class="tag3" style="display:none;">학생추천</div>
-				                </div>
-				                
-				            <!-- 학교, 전공 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/study.png" width="24px" /></div>					                  
-					                  <div class="s2i_desc"><%=bean.gettRecord() %></div>
-				                </div>
-				                
-				             <!-- 희망 과목 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/class.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=bean.gettSubject1() +","+ bean.gettSubject2() +","+bean.gettSubject3() %></div>      
-				                </div>
-				                
-				             <!-- 교습 대상 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/range.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=tgrade%></div>
-				                </div>
-				             <!-- 희망 지역 -->
-				                <div class="s2i_profile">
-				                  <div class="s2i_svg"><img src="img/location.png" width="24px" /></div>
-				                  <div class="s2i_desc"><%=bean.gettArea1() +","+ bean.gettArea2() +","+ bean.gettArea3()%></div>
-				                </div>
-				              
-				              </div>
-				              <!-- s2i_content 끝 -->
-		                </div>
-		                <!-- reviewDesc 끝-->
-		            </div>
-		            <!-- reviews 끝 -->
-		          </div>
-		          <!-- review 끝 -->
-		          </a>
-		       <!-- 리뷰3 끝 -->
-	      </div>
-	      <%
-	      
-	      bean = tpvlist.get(3);
-	      
-			grade = bean.gettRange();
-			tgrade = "교습대상 | ";
-			if(grade==1){tgrade += "초등학생";}
-			else if(grade==2){tgrade += "중학생";}
-			else if(grade==3){tgrade += "고등학생";}
-			else if(grade==4){tgrade += "대학생";}
-			else if(grade==5){tgrade += "성인";}
-			else if(grade==6){tgrade += "전체";}
-			
-			teacherNum = bean.getUserNum();
-
-			
-	      %>	      
-	      <div style="background-color: rgb(232, 232, 232);border-color: rgb(224, 224, 224);float: left;width: 32%;margin-right: 2%;margin-top: 2%;">
-	<!-- 리뷰4 시작 -->
-			<a href="Tpage.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>">			 				
-			       <div class="review">
-		            <div class="reviews">
-
-		                <img src="img/<%=bean.gettImage()%>" width="100%" height="100%" />
-			
-		                <div class="reviewDesc">
-		          		
-				              <div class="s2i_content">
-				                <div class="s2i_name"><b><%=bean.gettNickname() %></b></div>
-				    <!-- 최고선생님 이런거 붙이는곳 -->
-				    			<div class="tag">
-				    			<!-- 매칭률 높음 -->
-            						<div class="tag1" style="display:none;">우수 선생님</div>
-				                <!-- 동영상 등록여부 -->	
-				                	<div class="tag2" style="display:none;">동영상공개</div>
-				                <!-- 댓글여부 -->	
-				                	<div class="tag3" style="display:none;">학생추천</div>
-				                </div>
-				                
-				            <!-- 학교, 전공 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/study.png" width="24px" /></div>					                  
-					                  <div class="s2i_desc"><%=bean.gettRecord() %></div>
-				                </div>
-				                
-				             <!-- 희망 과목 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/class.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=bean.gettSubject1() +","+ bean.gettSubject2() +","+bean.gettSubject3() %></div>      
-				                </div>
-				                
-				             <!-- 교습 대상 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/range.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=tgrade%></div>
-				                </div>
-				             <!-- 희망 지역 -->
-				                <div class="s2i_profile">
-				                  <div class="s2i_svg"><img src="img/location.png" width="24px" /></div>
-				                  <div class="s2i_desc"><%=bean.gettArea1() +","+ bean.gettArea2() +","+ bean.gettArea3()%></div>
-				                </div>
-				              
-				              </div>
-				              <!-- s2i_content 끝 -->
-		                </div>
-		                <!-- reviewDesc 끝-->
-		            </div>
-		            <!-- reviews 끝 -->
-		          </div>
-		          <!-- review 끝 -->
-		        </a>  
-		       <!-- 리뷰4 끝 -->
-	      </div>
-	      <%
-	      
-	      bean = tpvlist.get(4);
-	      
-			grade = bean.gettRange();
-			tgrade = "교습대상 | ";
-			if(grade==1){tgrade += "초등학생";}
-			else if(grade==2){tgrade += "중학생";}
-			else if(grade==3){tgrade += "고등학생";}
-			else if(grade==4){tgrade += "대학생";}
-			else if(grade==5){tgrade += "성인";}
-			else if(grade==6){tgrade += "전체";}
-
-			teacherNum = bean.getUserNum();
-
-			
-	      %>	      
-	      <div style="background-color: rgb(149, 227, 187);border-color: rgb(88, 193, 137);float: left;width: 32%;margin-top: 2%;">
-	      	<!-- 리뷰5 시작 -->
-	      	<a href="Tpage.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>">
-	      	
-				 <div class="review">
-		            <div class="reviews">
-
-		                <img src="img/<%=bean.gettImage()%>" width="100%" height="100%" />
-			
-		                <div class="reviewDesc">
-		          		
-				              <div class="s2i_content">
-				                <!--<div class="s2i_name"><b><a href="Tpage.jsp?userNum=<%=bean.getUserNum()%>"><%=bean.gettNickname() %></a></b></div>-->
-				                <div class="s2i_name"><b><%=bean.gettNickname() %></b></div>
-				    			
-				    <!-- 최고선생님 이런거 붙이는곳 -->
-				    			<div class="tag">
-				    			<!-- 매칭률 높음 -->
-            						<div class="tag1" style="display:none;">우수 선생님</div>
-				                <!-- 동영상 등록여부 -->	
-				                	<div class="tag2" style="display:none;">동영상공개</div>
-				                <!-- 댓글여부 -->	
-				                	<div class="tag3" style="display:none;">학생추천</div>
-				                </div>
-				                
-				            <!-- 학교, 전공 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/study.png" width="24px" /></div>					                  
-					                  <div class="s2i_desc"><%=bean.gettRecord() %></div>
-				                </div>
-				                
-				             <!-- 희망 과목 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/class.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=bean.gettSubject1() +","+ bean.gettSubject2() +","+bean.gettSubject3() %></div>      
-				                </div>
-				                
-				             <!-- 교습 대상 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/range.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=tgrade%></div>
-				                </div>
-				             <!-- 희망 지역 -->
-				                <div class="s2i_profile">
-				                  <div class="s2i_svg"><img src="img/location.png" width="24px" /></div>
-				                  <div class="s2i_desc"><%=bean.gettArea1() +","+ bean.gettArea2() +","+ bean.gettArea3()%></div>
-				                </div>
-				              
-				              </div>
-				              <!-- s2i_content 끝 -->
-		                </div>
-		                <!-- reviewDesc 끝-->
-		            </div>
-		            <!-- reviews 끝 -->
-		          </div>
-		          <!-- review 끝 -->
-		       <!-- 리뷰5 끝 -->
-		       </a>
-	      </div>
-	      <%
-	      
-	      bean = tpvlist.get(5);
-	      
-			grade = bean.gettRange();
-			tgrade = "교습대상 | ";
-			if(grade==1){tgrade += "초등학생";}
-			else if(grade==2){tgrade += "중학생";}
-			else if(grade==3){tgrade += "고등학생";}
-			else if(grade==4){tgrade += "대학생";}
-			else if(grade==5){tgrade += "성인";}
-			else if(grade==6){tgrade += "전체";}
-			
-			teacherNum = bean.getUserNum();
-
-			
-	      %>	      
-	      <div style="background-color: rgb(232, 232, 232);border-color: rgb(224, 224, 224);float: left;width: 32%;margin-left: 2%;margin-top: 2%;">
-		<!-- 리뷰6 시작 -->				 
-			<a href="Tpage.jsp?userNum=<%= userNum %>&teacherNum=<%=teacherNum%>">			 
-				 <div class="review">
-		            <div class="reviews">
-
-		                <img src="img/<%=bean.gettImage()%>" width="100%" height="100%" />
-			
-		                <div class="reviewDesc">
-		          		
-				              <div class="s2i_content">
-				                <div class="s2i_name"><b><%=bean.gettNickname() %></b></div>
-				    <!-- 최고선생님 이런거 붙이는곳 -->
-				    			<div class="tag">
-				    			<!-- 매칭률 높음 -->
-            						<div class="tag1" style="display:none;">우수 선생님</div>
-				                <!-- 동영상 등록여부 -->	
-				                	<div class="tag2" style="display:none;">동영상공개</div>
-				                <!-- 댓글여부 -->	
-				                	<div class="tag3" style="display:none;">학생추천</div>
-				                </div>
-				                
-				            <!-- 학교, 전공 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/study.png" width="24px" /></div>					                  
-					                  <div class="s2i_desc"><%=bean.gettRecord() %></div>
-				                </div>
-				                
-				             <!-- 희망 과목 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/class.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=bean.gettSubject1() +","+ bean.gettSubject2() +","+bean.gettSubject3() %></div>      
-				                </div>
-				                
-				             <!-- 교습 대상 -->
-				                <div class="s2i_profile">
-					                  <div class="s2i_svg"><img src="img/range.png" width="24px" /></div>
-					                  <div class="s2i_desc"><%=tgrade%></div>
-				                </div>
-				             <!-- 희망 지역 -->
-				                <div class="s2i_profile">
-				                  <div class="s2i_svg"><img src="img/location.png" width="24px" /></div>
-				                  <div class="s2i_desc"><%=bean.gettArea1() +","+ bean.gettArea2() +","+ bean.gettArea3()%></div>
-				                </div>
-				              
-				              </div>
-				              <!-- s2i_content 끝 -->
-		                </div>
-		                <!-- reviewDesc 끝-->
-		            </div>
-		            <!-- reviews 끝 -->
-		          </div>
-		          <!-- review 끝 -->
-		          </a>
-		       <!-- 리뷰6 끝 -->
-			</div>
-    </div>
-    <!--포토리스트 End-->
-    <br />
     <!--리스트 Start-->
  <div id="tlist">
   <form name="searchFrm" method="get">
@@ -2147,15 +1593,12 @@
             height: 30px;
             font-size: 17px;"
         >
-       
-        
-          <th width="8%">사진</th>
-          <th width="5%">성별</th>
-          <th width="17.75%">닉네임</th>
-          <th width="29.75%">학력</th>
-          <th width="9%">과목</th>
-          <th width="9.8%">가능 요일</th>
-          <th width="9.8%">가능 시간</th>
+          <th width="10%">성별</th>
+          <th width="10%">닉네임</th>
+          <th width="15%">학년</th>
+          <th width="10%">희망 과목</th>
+          <th width="10%">가능 요일</th>
+          <th width="10%">가능 시간</th>
           <th width="10.75%">지역</th>
         </tr>
    
@@ -2181,10 +1624,10 @@
      	}
      	
      	
-    	Vector<TeacherBean> tlist = tmgr.getTeacherList1(request,keyWord, start, cnt);
-		Vector<UserBean>ulist = tmgr.getUserList(request,keyWord, start, cnt);
+    	Vector<StudentBean> slist = sMgr.getStudentList(request,keyWord, start, cnt);
+		Vector<UserBean>ulist = sMgr.getUserList(request,keyWord, start, cnt);
      	
-     	totalRecord = tmgr.getTotalCount(request,keyWord);
+     	totalRecord = sMgr.getTotalCount(request,keyWord);
 
      	
      			
@@ -2199,8 +1642,8 @@
      	
 			String gen ="";//성별 
 			
-        	int listSize = tlist.size();
-        	if(tlist.isEmpty()){
+        	int listSize = slist.size();
+        	if(slist.isEmpty()){
         		%><tr align="center"><td colspan="9" ><h1 style="text-align: center;">
         		<span style="color:rgb(88, 193, 137);">검색조건에</span>
         		<span style="color:rgb(230, 230, 230);">맞는</span>
@@ -2210,54 +1653,47 @@
         		
         for(int i=0;i<numPerPage;i++){
         	if(i==listSize) break;
-        	TeacherBean tbean = tlist.get(i);
+        	StudentBean sbean = slist.get(i);
         	UserBean ubean = ulist.get(i);
         	
-			teacherNum = tbean.getUserNum();
+        	StudentNum = sbean.getUserNum();
 			
 			if(ubean.getUserGender().equals("1"))
 				gen ="male.svg";
 			else if(ubean.getUserGender().equals("2"))
 				gen ="female.svg";
+
+			int sRecord = sbean.getsRecord();//최종 학력
+			int sYear = sbean.getsYear();//학년
+			int sFee = sbean.getsFee(); //비용
+			String sSubject1 = sbean.getsSubject1();//교습 과목1
+			String sDay = sbean.getsDay();//희망 요일
+			String sTime = sbean.getsTime();//희망 시간
+			String sArea1 = sbean.getsArea1();//희망 지역1
+			String area1 = sArea1.substring(0, 2); //지역
+			String nick = sbean.getsNickname();
 			
-			String tImage = tbean.gettImage();//사진
-			String tNickname = tbean.gettNickname();//닉네임
-			String tRecord = tbean.gettRecord();//최종 학력
-			String tSubject1 = tbean.gettSubject1();//교습 과목1
-			String tSubject2 = tbean.gettSubject2();//교습 과목2
-			String tSubject3 = tbean.gettSubject3();//교습 과목3
-			String tDay = tbean.gettDay();//희망 요일
-			String tTime = tbean.gettTime();//희망 시간
-			String tArea1 = tbean.gettArea1();//희망 지역1
-			String tArea2 = tbean.gettArea2();//희망 지역2
-			String tArea3 = tbean.gettArea3();//희망 지역3
-			 
-			String area1 = tArea1.substring(0, 2); //지역
+			String student = "";
+			if(sRecord==1) student = "초등학생";
+			if(sRecord==2) student = "중학생";
+			if(sRecord==3) student = "고등학생";
+			if(sRecord==4) student = "대학생";
+			if(sRecord==5) student = "대학원생(석,박사)";
+
         %>
+        
 		<tr align="center" 
-			style="border-top: solid;
-				   border-color: gray;
-				   border-width: 1px;" 
-				   onclick="javascript:location.href='Tpage.jsp?userNum=<%= userNum %>&teacherNum=<%=teacherNum%>'">
-			<td><img style="border-radius:100px;" class="profile1" src="img/<%=tbean.gettImage()%>"
-						width="40" height="40" ></td>
+			style="border-top: solid;border-color: gray;border-width: 1px;height: 35px;" 
+				   onclick="javascript:location.href='Spage.jsp?userNum=<%=userNum%>&studentNum=<%=StudentNum%>'">
 				<td><img src="img/<%=gen %>" width="20px" height="20px"/></td>
 			<td align="left">
-				 <div class="tag">
-				 <!-- 매칭률 높음 -->
-            	 <div class="tag1" style="display:none;">우수 선생님</div>
-				 <!-- 동영상 등록여부 -->	
-				 <div class="tag2" style="display:none;">동영상공개</div>
-				 <!-- 댓글여부 -->	
-				 <div class="tag3" style="display:none;">학생추천</div>
-				 </div>
-				<div><%=tNickname%></div>
+				<div><%=nick %></div>
 			</td>
-			<td align="left"><div class="s2i_desc"><%=tRecord%></div></td>
-			<td><%=tSubject1%> 등</td>
-			<td><%=tDay%></td>
-			<td><%=tTime%></td>
-			<td><%=area1%>지역</td>
+			<td align="left"><div class="s2i_desc"><%=student %> <%=sYear %>학년</div></td>
+			<td><%=sSubject1 %> 등</td>
+			<td><%=sDay %></td>
+			<td><%=sTime %></td>
+			<td><%=area1 %> 지역</td>
 		</tr>
         <%}//---for1%>
        <%}//---if-else%>
@@ -2296,14 +1732,15 @@
 		</td>
 		</tr>
 	</table>
-     
-    </div>
+</div>
+
     <form name="listFrm" method="post">
 		<input type="hidden" name="reload" value="true"> 
 		<input type="hidden" name="nowPage" value="1">
 	</form>
-	
-	<form name="readFrm" method="get">
+
+    <!--리스트 End-->
+    		<form name="readFrm" method="get">
 		<input type="hidden" name="nowPage" value="<%=nowPage%>"> 
 		<input type="hidden" name="numPerPage" value="<%=numPerPage%>"> 
 		<input type="hidden" name="keyWord" value="<%=keyWord%>">
@@ -2330,16 +1767,15 @@
 		<input type="hidden" name="tbtn" value="<%=request.getParameter("tbtn")%>">
 		<input type="hidden" name="tobj" value="<%=request.getParameter("tobj")%>">
 		<input type="hidden" name="gbtn" value="<%=request.getParameter("gbtn")%>">
-		<input type="hidden" name="Astart" value="<%=request.getParameter("Astart")%>">
-		<input type="hidden" name="Aend" value="<%=request.getParameter("Aend")%>">
+
 		
 	</form>
-    	
+	<br>
     </div><!-- contentWrap -->
-  <br>
+  
 	<div include-html="footer.jsp"></div>
-    <footer include-html="footer1.jsp"></footer>
-    <script>
+	<footer include-html="footer1.jsp"></footer>
+	 <script>
       includeHTML();
       
       $(document).ready(function () {
@@ -2347,7 +1783,6 @@
               scrollTop: $('#contentWrap').offset().top
           }, 'fast'); //slow
       });
-      
     </script>
   </body>
   

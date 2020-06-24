@@ -165,11 +165,11 @@ public class TsearchMgr {
 			
 			while(rs.next()) {
 				
-				bean.setUserNum(rs.getInt(1)); //유저아이디
-				bean.setUserId(rs.getString(2)); //학교 학과
-				bean.setUserName(rs.getString(4)); //교습대상
-				bean.setUserBirth(rs.getString(8));//희망과목1
-				bean.setUserGender(rs.getString("userGender"));//희망과목2
+				bean.setUserNum(rs.getInt("userNum")); 
+				bean.setUserId(rs.getString("userId")); 
+				bean.setUserName(rs.getString("userName")); 
+				bean.setUserBirth(rs.getString("userBirth"));
+				bean.setUserGender(rs.getString("userGender"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -177,5 +177,70 @@ public class TsearchMgr {
 			pool.freeConnection(con, pstmt, rs);
 		}
 		return bean;
+	}
+	//매칭(접속자, 매칭자)
+	public void following(int userNum, int teacherNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		try {
+			con = pool.getConnection();
+			sql = "insert into tblmatch(follower, followed) values(?,?)";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			pstmt.setInt(2, teacherNum);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+	}
+	//매치관계 검사
+	public boolean isfollowed(int userNum, int teacherNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "select * from tblmatch where follower=? and followed=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			pstmt.setInt(2, teacherNum);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				flag=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return flag;
+	}
+	
+	public String getImage(int userNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		String tImage=null;
+		try {
+			con = pool.getConnection();
+			sql = "select timage from tblteacher where userNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				tImage=rs.getString(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return tImage;
 	}
 }

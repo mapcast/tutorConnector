@@ -1,64 +1,71 @@
 <%@page import="java.util.Vector"%>
+<%@page import="bean.TeacherBean"%>
+<%@page import="bean.UserBean"%>
+<%@page import="bean.ReviewBean"%>
+<%@page import="bean.StudentBean"%>
 <%@page import="mgr.UtilMgr"%>
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
-<%@page import="bean.UserBean"%>
 <%@page import="org.eclipse.jdt.internal.compiler.ast.UsesStatement"%>
-<%@page import="bean.TeacherBean"%>
-<%@page import="bean.ReviewBean"%>
-<%@page import="bean.StudentBean"%>
 <%@ page contentType="text/html; charset=EUC-KR"%>
-<jsp:useBean id="t2Mgr" class="mgr.TeacherList2Mgr"/>
 <jsp:useBean id="tsMgr" class="mgr.TsearchMgr"/>
 <jsp:useBean id="rMgr" class="mgr.ReviewMgr"/>
 <jsp:useBean id="sMgr" class="mgr.StudentMgr"/>
-<jsp:useBean id="tMgr" class="mgr.TeacherMgr"/>
-<% 
+<%
 	request.setCharacterEncoding("EUC-KR");
-	
-	int totalRecord = 0;//총게시물수
-	int numPerPage = 5;//페이지당 레코드 개수(5,10,15,30)
-	int pagePerBlock = 5;//블럭당 페이지 개수
-	int totalPage = 0;//총 페이지 개수
-	int totalBlock = 0;//총 블럭 개수
-	int nowPage = 1;//현재 페이지
-	int nowBlock = 1;//현재 블럭
-	
-	
-			
-		//nowPage 요청 처리
-		if(request.getParameter("nowPage")!=null){
-			nowPage = UtilMgr.parseInt(request, "nowPage");
-		}
-	
-		//sql문에 들어가는 start, cnt 선언
-				int start = (nowPage*numPerPage)-numPerPage;
-				int cnt = numPerPage;
+
+int totalRecord = 0;//총게시물수
+int numPerPage = 3;//페이지당 레코드 개수(5,10,15,30)
+int pagePerBlock = 5;//블럭당 페이지 개수
+int totalPage = 0;//총 페이지 개수
+int totalBlock = 0;//총 블럭 개수
+int nowPage = 1;//현재 페이지
+int nowBlock = 1;//현재 블럭
+
+
 		
-		// 현재 toNum에 작성된 총 리뷰 수
-		totalRecord = rMgr.getReviewCnt(22);
-		
-		//전체페이지 개수
-		totalPage = (int)Math.ceil((double)totalRecord/numPerPage);
-		//전체블럭 개수
-		totalBlock = (int)Math.ceil((double)totalPage/pagePerBlock);
-		//현재블럭
-		nowBlock = (int)Math.ceil((double)nowPage/pagePerBlock);	
+	//nowPage 요청 처리
+	if(request.getParameter("nowPage")!=null){
+		nowPage = UtilMgr.parseInt(request, "nowPage");
+	}
+
+	//sql문에 들어가는 start, cnt 선언
+			int start = (nowPage*numPerPage)-numPerPage;
+			int cnt = numPerPage;
 	
-//int userNum = 3;
-//	int userNum = Integer.parseInt(request.getParameter("userNum"));
+	// 현재 toNum에 작성된 총 리뷰 수
+	totalRecord = rMgr.getReviewCnt(3);
+	//전체페이지 개수
+	totalPage = (int)Math.ceil((double)totalRecord/numPerPage);
+	//전체블럭 개수
+	totalBlock = (int)Math.ceil((double)totalPage/pagePerBlock);
+	//현재블럭
+	nowBlock = (int)Math.ceil((double)nowPage/pagePerBlock);
+
 	
+	int userNum = Integer.parseInt(request.getParameter("userNum"));
+	int teacherNum = Integer.parseInt(request.getParameter("teacherNum"));
+	
+
 %>
 
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="EUC-KR" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="js/includeHTML.js"></script>
     <script type="text/javascript" src="js/jquery-3.5.0.min.js"></script>
+    <script>
+    function alreadyStudent(){
+		alert("이미 학생으로 등록되어 있습니다!");
+	}
+	function alreadyTeacher(){
+		alert("이미 선생님으로 등록되어 있습니다!");
+	}
+    </script>
     <style>
       * {
         box-sizing: border-box;
@@ -74,24 +81,28 @@
         margin-top: 70px;
       }
     .search{/*바깥 큰 테두리*/
-		background-color: rgb(243, 243, 243);
-		margin:0px 10%;
+		background-color: #eeeeee;
+		margin:0px 5%;
 		border-radius: 5px;
 	}     
 	 /*현승씨 코드*/
        .review {
         border-radius: 6px;
-        padding: 15px;
+        padding: 20px;        
       }
       .reviews {
         height: 100%;
-        display: flex;
+        background-color:white;
         border-radius: 6px;
+        padding:20px;
+        padding-left:50px;
       }
       .reviewImg {
-        width: 150px;
-        height: 150px;
-        padding: 20px;
+        width: 200px;
+        height: 200px;
+        border-radius: 5px;
+        border: 3px solid red;
+        margin: 0 25px;
       }
       .reviewDescWrap {
         width: 170px;
@@ -125,30 +136,37 @@
       }
       /*메뉴*/
       .s2i_name {
-        margin:10px;
+        margin:5px;
         margin-left:0px;
         font-size: 15px;
-        padding:5px;
+        padding:6px;
       }
       .profile {
         display: flex;
       }
 	/*리스트*/
-	
-	 .rlist {
-        border-radius: 6px;
-        padding: 15px;
-        height: 140px;
-      }
       .s2i_desc {
-      	padding:5px;
-      	margin: 10px;
+        width:130px;
+        text-align:center;        
+      	padding:6px;
+      	margin: 5px;
       	margin-right:4px;
         font-size: 15px;
         background-color: rgb(88, 193, 137);
         color:white;
         border-radius: 5px;
+        font-weight: bold;
+        }
+      .pretag{
+      	width:800px;
+      	white-space: pre-wrap; /* CSS3*/
+		white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+		white-space: -pre-wrap; /* Opera 4-6 */
+		white-space: -o-pre-wrap; /* Opera 7 */
+		word-wrap: break-all; /* Internet Explorer 5.5+ */ 
       }
+      
+      /*후기 내용*/
       div.comment {
       	margin-left: 20px;
       	width: 100%;
@@ -159,75 +177,59 @@
       	width: 100%;
       	height: 110px;
       }
-    /*별점*/
-    #star_grade a{
-        text-decoration: none;
-        color: gray;
-    }
-    #star_grade a.on{
-        color: red;
-    }
-    
-    .page a{
-      color:black;
-      }
-    
-    table.page1 {
-      	width: 100%;
-      }
-    
-    a.up{
-	color:darkgrey;
-	}
+      
+      /*별점*/
+	 #star_grade a{
+	        text-decoration: none;
+	        color: gray;
+	    }
+	#star_grade a.on{
+	        color: red;
+	    }
+	    
+	.page a{
+	      color:black;
+	      }
+	    
+	table.page1 {
+	      	width: 100%;
+	      }
+	    
+	a.up{
+		color:darkgrey;
+		}
 	a.page .next{
-	background-color: rgb(88, 193, 137);
-	border: 1px solid rgb(88, 193, 137);
-	color: white;
-	border-radius: 5px;
-	font-weight: bold;
-	font-size: 15px;
-	margin: 0px 3px;
-	}
-	
-	.page .next{
-	background-color: rgb(88, 193, 137);
-	border: 1px solid rgb(88, 193, 137);
-	color: white;
-	border-radius: 5px;
-	font-weight: bold;
-	font-size: 15px;
-	margin: 0px 3px;
-
-	}
-    /* 
-    input.cinsert {
-    	background-color: rgb(88, 193, 137);
+		background-color: rgb(88, 193, 137);
 		border: 1px solid rgb(88, 193, 137);
 		color: white;
-		width: 4vw;
-		height: 25px;
 		border-radius: 5px;
 		font-weight: bold;
-		font-size: 14px;
-		margin-top: 10px;
-		
-    }
-    
-    input.ctext {
-    	height: 100%
-    }
-      */
+		font-size: 15px;
+		margin: 0px 3px;
+		}
+	
+	.page .next{
+		background-color: rgb(88, 193, 137);
+		border: 1px solid rgb(88, 193, 137);
+		color: white;
+		border-radius: 5px;
+		font-weight: bold;
+		font-size: 15px;
+		margin: 0px 3px;
+	
+		}
+      
     </style>
   </head>
   <body>
-  <header include-html="header.jsp"></header>
-
+    <header include-html="header.jsp"></header>
+	
     	<div id="contentWrap">
     		<h2>선생님 상세 페이지</h2>
     		<div id='searchv' class="search">
     			<%
-    				TeacherBean bean = tsMgr.Tpage(22);
-    				UserBean ubean = tsMgr.Tinfopage(22);
+    				TeacherBean bean = tsMgr.Tpage(teacherNum);
+    				UserBean ubean = tsMgr.Tinfopage(teacherNum);
     			    
     				//교습대상 변경
     				int grade = bean.gettRange();
@@ -240,10 +242,10 @@
     				else if(grade==6){tgrade += "전체";}
     				
     				//성별 변경
-    				int gender = Integer.parseInt(ubean.getUserGender());
-    				String tgender = "d";
-    				if(gender==1){tgender="남자";}
-    				else if(gender==2){tgender="여자";}
+    				String gender = ubean.getUserGender();
+    				String tgender = "";
+    				if(gender.equals("1")){tgender="남자";}
+    				else if(gender.equals("2")){tgender="여자";}
     				
     				//생년월일 계산
     				String birth = ubean.getUserBirth();
@@ -267,30 +269,28 @@
 					
     			%>
     			<div class="review">
-		            <div class="reviews">
+		            <div class="reviews" style="display: flex;justify-content:center;">
+						<div class="reviewImg">
+		                <img src="img/<%=bean.gettImage()%>" style="border-radius: 5px;" width="100%" height="100%" />
+						</div>
 
-		                <img src="img/<%=bean.gettImage()%>" style="border-radius: 5px;        margin-top:23px;
-		                " width="200px" height="200px" />
-			
 		                <div class="reviewDesc">
-		          		
 				              <div class="s2i_content">
 				              		<div class="profile">
 					              		<div class="content">
 						              			<div class="s2i_desc">이름</div>
-						                		<div class="s2i_name"><b><%=ubean.getUserName() %></b></div>
+						                		<div class="s2i_name"><%=ubean.getUserName() %></div>
 				                		</div>
 				                		<div class="content">
 						                		<div class="s2i_desc" >닉네임</div>
-						                		<div class="s2i_name"><b><%=bean.gettNickname() %></b></div>
+						                		<div class="s2i_name"><%=bean.gettNickname() %></div>
 				                		</div>
 									</div>
-				                
 				            <!-- 학교, 전공 -->
 				                <div class="profile">
 						              <div class="content">
 						                	<div class="s2i_desc">나이 / 성별</div>
-						                	<div class="s2i_name"><b><%= year +"세 / "+tgender%></b></div>
+						                	<div class="s2i_name"><%= year +"세 / "+tgender%></div>
 					                	</div>
 						                <div class="content">
 							                  <div class="s2i_desc" >횟수 / 시간</div>					                  
@@ -325,48 +325,65 @@
 				              <!-- s2i_content 끝 -->
 		                </div>
 		                <!-- reviewDesc 끝-->
+		                
 		            </div>
-		            <!-- reviews 끝 -->
-		          </div>
-				              <hr>
+			            <!-- 자기소개 -->
+			           <div class="reviews" style="margin:20px 0 0 0;">
+					           <div class="content">
+							       <div class="s2i_desc">자기소개</div>
+							        <div class="s2i_name"> </div>
+			    				</div>    				
+					          <div class="content" style="width:100%;">
+					          			<div class="s2i_name" style="margin:10px;"><pre class="pretag"><%=bean.gettPR() %></pre></div>
+			    				</div>
+	    				</div>
+	    			<!-- 자기소개 끝-->
+<!-- 동영상 소개 -->
 
-		          <!-- review 끝 -->
-		          <!-- 자기소개 -->
-		          <div class="content">
-				       <div class="s2i_desc">자기소개</div>
-				        <div class="s2i_name"> </div>
+				<%
+					String File = bean.gettFile(); 
+				
+					if(File=="") {
+				%>	    			
+	 			  <div class="reviews" style="margin:20px 0 0 0;display:none" >  			
+	    				<div class="content">
+						       <div class="s2i_desc" >동영상</div>
+						        <div class="s2i_name"> 
+				        </div>
     				</div>
+    			<%	} else {%>
+    				<div class="reviews" style="margin:20px 0 0 0;" >  			
+	    				<div class="content">
+						       <div class="s2i_desc" >동영상</div>
+						        <div class="s2i_name"> 
+				        </div>
+    				</div>
+    			<%}%>
     				
-		          <div class="content" style="width:100%;">
-		          			<div class="s2i_name" style="margin:10px;"><%=bean.gettPR() %></div>
+		          <div class="content" style="width:100%;padding-top: 10px;">				
+						<video src="./video/<%=bean.gettFile() %>" style="margin:auto;padding-top: 10px;" width="640" controls>브라우저가 지원하지 못할 시 표시할 내용</video>
     				</div>
-    			<!-- 자기소개 끝 -->
-    							              <hr>
-    			
-    			
-    			<!-- 동영상 소개 -->
-		          <div class="content">
-				       <div class="s2i_desc">동영상</div>
-				        <div class="s2i_name"> </div>
-    				</div>
-    				
-		          <div class="content" style="width:100%;">				
-						<video src="./video/<%=bean.gettFile() %>" style="margin:auto;" width="640" controls poster="./img/logo2.jpg">브라우저가 지원하지 못할 시 표시할 내용</video>
-    				</div>
-    			<!-- 동영상 소개 끝 -->		
-    				<br>
-    				
+	    		</div>	
+ <!-- 동영상 소개 끝 -->   			    			    				
+   		          </div><!-- reviews 끝 -->
     		</div><!-- search -->
-    		
-    			<!-- 후기 시작 -->
+    		</br>
+    			<!-- 댓글 달기 시작 -->
 				 <h2>선생님 후기</h2>
 				 
 				 <div>
 				 <%
-		        	Vector<ReviewBean> rlist = rMgr.getReviewList2(start, cnt, 22);
+		        	Vector<ReviewBean> rlist = rMgr.getReviewList2(start, cnt, teacherNum);
 		         	int listSize = rlist.size();
 		        	if(rlist.isEmpty()){
-		        		%><div align="center">"등록된 리뷰가 없습니다."</div>
+		        		%><div class="review" style="background:rgb(243, 243, 243); margin:0px 10%;">
+		        				<td colspan="9"><h1 style="text-align: center;">
+	        						<span style="color:gray;">등록된</span>
+	        						<span style="color:rgb(88, 193, 137);">후기가 </span>
+	        						<span style="color:gray;">없습니다.</span>
+	        					</h1></td>
+	        			  </div>
+	        			</br>
 		        	<%}else{
 		        		
 		        for(int i=0;i<numPerPage;i++){
@@ -380,7 +397,7 @@
 					int ReviewRate = rbean.getReviewRate(); //별점
 					String Ip = rbean.getIp(); //ip수집
 					StudentBean sbean=sMgr.getStudentInfo(fromNum);
-					String tImage=tMgr.getImage(fromNum);
+					String tImage=tsMgr.getImage(fromNum);
 		        %>
 		        <div class="rlist">
 					<div class="review" style="background:rgb(243, 243, 243); margin:0px 10%;  display: flex;">
@@ -414,7 +431,7 @@
 							        	%><a style="color:red;">★★★★★</a><%;
 							            break;
 							        default:
-							        	%>별점이 없습니다<%;
+							        	%><a style="color:gray;">★★★★★</a><%;
 							            break;
 							        } %></p>
 						</div>
@@ -463,23 +480,33 @@
 				</td>
 				</tr>
 		</table>
-    	
-    	</br>
-    	
-    	<form name="listFrm" method="post">
-		<input type="hidden" name="reload" value="true"> 
-		<input type="hidden" name="nowPage" value="1">
+				
+		<form name="listFrm" method="post">
+			<input type="hidden" name="reload" value="true"> 
+			<input type="hidden" name="nowPage" value="1">
 		
-	</form>
+		</form>
     	
     	<form name="readFrm">
-		<input type="hidden" name="nowPage" value="<%=nowPage%>"> 
-		<input type="hidden" name="numPerPage" value="<%=numPerPage%>"> 
-	</form>
-	</div>
+			<input type="hidden" name="nowPage" value="<%=nowPage%>"> 
+			<input type="hidden" name="numPerPage" value="<%=numPerPage%>"> 
+		</form>		
+		
+				<!-- 댓글 달기 끝-->
+				
+		<div class="content" style="justify-content: flex-end;width: 100%;">
+				<div class="s2i_desc"><a href="TpageProc.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>">1:1 채팅하기</a></div>
+				<div class="s2i_desc" onclick=""><a href="TpageProc.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>">찜하기</a></div>
+				<div class="s2i_desc" ><a href="javascript:history.back()">뒤로</a></div>
+		</div>
+		
+		
+    	</div>
+    	<br>
 	<div include-html="footer.jsp"></div>
     <footer include-html="footer1.jsp"></footer>
-    <script>
+    
+     <script>
       includeHTML();
       
       $('#star_grade a').click(function(){

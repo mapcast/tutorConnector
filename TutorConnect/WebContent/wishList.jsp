@@ -346,12 +346,14 @@
 	                <td><%=area %></td>
 	                <td><%=status %></td>
 	                <td>
+	                  <%if(mmgr.isMatched(userNum, teacherNum)){ %>
 	                  <%if(rmgr.hasReview(userNum, teacherNum)){ %>
 	                  <input class="tableButton" type="button" value="리뷰작성" style="font-size: 10px;" onClick="alert('이미 작성한 리뷰가 존재합니다.')"/>
 	                  <%}else{ %>
 	                  <input class="tableButton" type="button" value="리뷰작성" style="font-size: 10px;" onClick="openReview(<%=userNum%>, <%=teacherNum%>)"/>
 	                  <%} %>
 	                  <br />
+	                  <%}%>
 	                  <input class="tableButton" type="button" value="삭제" onClick="deleteMatch(<%=userNum%>, <%=teacherNum%>)" />
 	                </td>
 	              </tr>
