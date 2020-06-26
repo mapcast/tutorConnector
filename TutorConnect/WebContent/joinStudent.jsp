@@ -208,6 +208,14 @@
         padding-top:5px;
         padding-left:2px;
       }
+      .idCheckButton{
+      	margin-left:20px;
+      	border:none;
+      	background-color: rgb(88, 193, 137);
+      	color:white;
+      	border-radius:4px;
+      	cursor:pointer;
+      }
     </style>
     <link
       href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css"
@@ -255,6 +263,9 @@
     			alert("닉네임을 입력해주세요!");
     			form.sNickname.focus();
     		}
+    		else if(form.isExistsFlag.value!="yes"){
+    			alert("닉네임체크를 해주세요!");
+    		}
     		else if(form.sRecord.value=="0"){
     			alert("학력을 입력해주세요!");
     		}
@@ -294,6 +305,19 @@
     	function alreadyTeacher(){
     		alert("이미 선생님으로 등록되어 있습니다!");
     	}
+    	function nickCheck(){
+      		var nick=document.studentFrm.sNickname.value;
+      		var _width = '300';
+    	    var _height = '150';
+    	    var _left = Math.ceil(( window.screen.width - _width )/2);
+    	    var _top = Math.ceil(( window.screen.width - _height )/4); 
+    	    if(nick == ""){
+    			alert("닉네임을 입력해주세요");
+    		}else{
+    			url="nickCheck2.jsp?nick="+nick;
+    			window.open(url,"check", 'width='+ _width +', height='+ _height +', left=' + _left + ', top='+ _top );
+    		}
+      	}
     </script>
   </head>
   <body>
@@ -319,12 +343,14 @@
           </div>
         </div>
         <form method="post" name="studentFrm" action="joinStudentProc.jsp">
+        <input type="hidden" name="isExistsFlag" value="no">
       	<input type="hidden" name="userNum" value="<%=userNum%>">
         <div class="joinFlex">
           <div class="inputDesc">닉네임</div>
           <div class="inputBox">
             <input type="text" name="sNickname" class="input" placeholder="10자 제한" maxlength="10"/>
           </div>
+          <input type="button" class="idCheckButton" value="닉네임체크" onClick="nickCheck()"/>
         </div>
         <div class="joinFlex">
           <div class="inputDesc">학력</div>

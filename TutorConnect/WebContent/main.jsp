@@ -530,7 +530,7 @@
       		String area=teacher.gettArea1().substring(0,2);//ex)부산부산진구로 데이터가 들어간 경우 부산만 가져오기 위함.
       		%>
       	<div class="s2_content">
-          <a href="">
+          <a href="Tpage.jsp?userNum=<%=userNum%>&teacherNum=<%=teacher.getUserNum()%>">
             <div class="s2_item">
               <div class="s2i_img">
                 <img src="img/<%=URLEncoder.encode(teacher.gettImage(), "EUC-KR") %>" width="262px" height="160px" />

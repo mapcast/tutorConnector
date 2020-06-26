@@ -376,7 +376,7 @@
                     height="40"
                   />
                 </td>
-                <td><a class="teacherName" href=""><%=tInfo.getUserName() %></a></td>
+                <td><a class="teacherName" href="Tpage.jsp?userNum=<%=userNum%>&teacherNum=<%=toNum%>"><%=tInfo.getUserName() %></a></td>
                 <td>
                   <div class="ellipsis">
                     <%=review %>

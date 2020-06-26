@@ -286,5 +286,28 @@ public class UserMgr {
 			pool.freeConnection(con, pstmt);
 		}
 	}
+	public boolean isExists(String userId) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "select userNum from tbluser where userId=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, userId);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				flag=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return flag;
+
+	}
 	
 }

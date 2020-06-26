@@ -124,7 +124,11 @@ public class TeacherMgr {
 			pstmt.setString(14, multi.getParameter("tPR"));
 			pstmt.setString(15, tImage);
 			pstmt.setString(16, tFile);
-			pstmt.setInt(17, Integer.parseInt(multi.getParameter("tOpen")));
+			if(multi.getParameter("tOpen")!=null) {
+				pstmt.setInt(17, Integer.parseInt(multi.getParameter("tOpen")));
+			}else {
+				pstmt.setInt(17, 0);
+			}
 			pstmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -687,6 +691,29 @@ public class TeacherMgr {
 				sql = "select userNum from tblteacher where userNum=?";
 				pstmt = con.prepareStatement(sql);
 				pstmt.setInt(1, userNum);
+				rs = pstmt.executeQuery();
+				if(rs.next()) {
+					flag=true;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				pool.freeConnection(con, pstmt, rs);
+			}
+			return flag;
+
+		}
+		public boolean isExists(String tNickName) {
+			Connection con = null;
+			PreparedStatement pstmt = null;
+			ResultSet rs = null;
+			String sql = null;
+			boolean flag=false;
+			try {
+				con = pool.getConnection();
+				sql = "select usernum from tblteacher where tNickName=?";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setString(1, tNickName);
 				rs = pstmt.executeQuery();
 				if(rs.next()) {
 					flag=true;

@@ -18,7 +18,7 @@
 			mmgr.matching(userNum2, userNum1);
 			msg="매칭이 완료되었습니다!";
 		}else if(flags.equals("decline")){
-			mmgr.matchCancle(userNum1,userNum2);
+			mmgr.matchCancle(userNum2,userNum1);
 			mmgr.decline(userNum1, userNum2);
 			msg="매칭을 거절했습니다.";
 		}else{

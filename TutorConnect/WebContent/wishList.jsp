@@ -337,7 +337,7 @@
 	                  />
 	                </td>
 	
-	                <td><a class="teacherName" href=""><%=userName %></a></td>
+	                <td><a class="teacherName" href="Tpage.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>"><%=userName %></a></td>
 	                <td>
 	                  <div class="ellipsis">
 	                    <%=subject %>
@@ -390,7 +390,7 @@
               %>
               <tr class="tableContent">
                 <td colspan="6">
-                  찜한 선생님이 없습니다.
+                  찜한 학생이 없습니다.
                 </td>
               </tr>
               <%}else{ %>
@@ -437,7 +437,7 @@
 	                  />
 	                </td>
 	
-	                <td><a class="teacherName" href=""><%=userName %></a></td>
+	                <td><a class="teacherName" href="Spage.jsp?userNum=<%=userNum%>&studentNum=<%=studentNum%>"><%=userName %></a></td>
 	                <td>
 	                  <div class="ellipsis">
 	                    <%=subject %>

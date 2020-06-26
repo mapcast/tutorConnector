@@ -50,7 +50,21 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <script type="text/javascript">   
+    <script type="text/javascript">  
+    function openChatting(num){
+		if(num==0){
+			alert("채팅 기능은 로그인 후 이용하실 수 있습니다.");
+		}else{
+			url="chatting.jsp?userNum="+num;
+			window.open(url, "chat", "width=1000, height=601, scrollbars=no, location=no, toobar=no, menubar=no");
+		}
+	}
+    function alreadyStudent(){
+		alert("이미 학생으로 등록되어 있습니다!");
+	}
+	function alreadyTeacher(){
+		alert("이미 선생님으로 등록되어 있습니다!");
+	}
     //페이징 처리 시작
       function listin() {
 

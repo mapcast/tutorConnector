@@ -63,7 +63,6 @@
       .joinFlex {
         display: flex;
         padding-left:14vw;
-        padding-right:10vw;
         margin-bottom: 30px;
       }
       #title {
@@ -214,6 +213,14 @@
       }
       textarea:focus{
         outline:none;
+      }
+      .idCheckButton{
+      	margin-left:20px;
+      	border:none;
+      	background-color: rgb(88, 193, 137);
+      	color:white;
+      	border-radius:4px;
+      	cursor:pointer;
       }
       
       .filebox input[type="file"] {
@@ -367,6 +374,9 @@ $(document).ready(function(){
     			alert("닉네임을 입력해주세요!");
     			form.tNickname.focus();
     		}
+    		else if(form.isExistsFlag.value!="yes"){
+    			alert("닉네임체크를 해주세요!");
+    		}
     		else if(form.tRecord.value==""){
     			alert("학력을 입력해주세요!");
     		}
@@ -409,6 +419,19 @@ $(document).ready(function(){
     	function alreadyTeacher(){
     		alert("이미 선생님으로 등록되어 있습니다!");
     	}
+    	function nickCheck(){
+      		var nick=document.teacherFrm.tNickname.value;
+      		var _width = '300';
+    	    var _height = '150';
+    	    var _left = Math.ceil(( window.screen.width - _width )/2);
+    	    var _top = Math.ceil(( window.screen.width - _height )/4); 
+    	    if(nick == ""){
+    			alert("닉네임을 입력해주세요");
+    		}else{
+    			url="nickCheck.jsp?nick="+nick;
+    			window.open(url,"check", 'width='+ _width +', height='+ _height +', left=' + _left + ', top='+ _top );
+    		}
+      	}
     </script>
   </head>
   <body>
@@ -435,13 +458,14 @@ $(document).ready(function(){
         </div>
      <form name="teacherFrm" method="post" action="TeacherServlet" 
 enctype="multipart/form-data">
-      
+      <input type="hidden" name="isExistsFlag" value="no"/>
 	<input type="hidden" name="userNum" value="<%=userNum%>">
         <div class="joinFlex">
           <div class="inputDesc">닉네임</div>
           <div class="inputBox">
-            <input type="text" name="tNickname" class="input" placeholder="10글자 제한" maxlength="10" />
+            <input type="text" name="tNickname" class="input" placeholder="10글자 제한" maxlength="10" value="" />
           </div>
+          <input type="button" class="idCheckButton" value="닉네임체크" onClick="nickCheck()"/>
         </div>
         <div class="joinFlex">
           <div class="inputDesc">최종학력</div>

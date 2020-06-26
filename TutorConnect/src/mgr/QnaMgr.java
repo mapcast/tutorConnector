@@ -14,7 +14,7 @@ import bean.QNABean;
 
 public class QnaMgr {
 	private DBConnectionMgr pool;
-	public static final String SAVEFOLDER = "C:\\Users\\it\\git\\repository\\myapp\\WebContent\\teamproject\\QnA_File";
+	public static final String SAVEFOLDER = "C:/Users/it/git/tutorConnector/TutorConnect/WebContent/img/";
 	public static final String ENCTYPE = "EUC-KR";
 	public static int MAXSIZE = 10*1024*1024;
 	
@@ -33,17 +33,19 @@ public class QnaMgr {
 		}
 		try {
 			String filename = null;
-			if(multi.getFilesystemName("filename")!=null) { //사용자가 파일 업로드 한 경우
+			if(multi.getFilesystemName("filename")!=null) { 
 				filename = multi.getFilesystemName("filename");
 			}	
+			int ref = getMaxNum() + 1;
 			con = pool.getConnection();
-			sql = "insert tblQna (fromNum, inqTitle, inqContent, inqDate, pos, ref, depth, filename, secret) values(?,?,?,now(),0,0,0,?,?)";
+			sql = "insert tblQna (fromNum, inqTitle, inqContent, inqDate, pos, ref, depth, filename, secret) values(?,?,?,now(),0,?,0,?,?)";
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, multi.getParameter("fromNum"));
 			pstmt.setString(2, multi.getParameter("inqTitle"));
 			pstmt.setString(3, multi.getParameter("inqContent"));
-			pstmt.setString(4, filename);
-			pstmt.setString(5, A);
+			pstmt.setInt(4, ref);
+			pstmt.setString(5, filename);
+			pstmt.setString(6, A);
 			if(pstmt.executeUpdate()==1) flag = true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -105,7 +107,7 @@ public class QnaMgr {
 		return bean;
 	}
 	
-	public int getTotalCount() {
+	public int getTotalCount(String keyField, String keyWord) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -113,8 +115,15 @@ public class QnaMgr {
 		int totalCount = 0;
 		try {
 			con = pool.getConnection();
-			sql = "select count(*) from tblQna";
-			pstmt = con.prepareStatement(sql);
+			sql = "select count(*) from tblqna";
+			if(keyWord.trim().equals("")||keyWord==null) { 
+				sql = "select count(*) from tblqna";
+				pstmt = con.prepareStatement(sql);
+			}else {
+				sql = "select count(*) from tblqna where "+keyField+" like ?";
+				pstmt = con.prepareStatement(sql); 
+				pstmt.setString(1, "%"+keyWord+"%");
+			}
 			rs = pstmt.executeQuery();
 			if(rs.next()) totalCount = rs.getInt(1);
 		} catch (Exception e) {
@@ -124,8 +133,8 @@ public class QnaMgr {
 		}
 		return totalCount;
 	}
-	
-	public Vector<QNABean> getQnaList(int start){
+
+	public Vector<QNABean> getQnaList(String keyField, String keyWord, int start){
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -133,9 +142,21 @@ public class QnaMgr {
 		Vector<QNABean> vlist = new Vector<QNABean>();
 		try {
 			con = pool.getConnection();
-			sql = "select inqNum ,inqDate, inqTitle, fromNum, secret from tblqna where inqTitle not IN('asdf') order by inqNum desc LIMIT ?,10 ";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setInt(1, start);
+			if(keyWord.trim().equals("")||keyWord==null) { 
+				sql = "select inqNum ,inqDate, inqTitle, fromNum, secret, depth from tblqna order by ref, pos desc LIMIT ?,10 ";
+				pstmt = con.prepareStatement(sql);
+				pstmt.setInt(1, start);
+			}else if(keyWord!=null&keyField.equals("userName")) { 
+				sql = "select inqNum ,inqDate, inqTitle, fromNum, secret, depth from tblqna, tbluser where userName like ? and userNum=fromNum order by ref, pos desc limit ?,10";
+				pstmt = con.prepareStatement(sql); 
+				pstmt.setString(1, "%"+keyWord+"%"); 
+				pstmt.setInt(2, start);
+			}else if(keyWord!=null&keyField.equals("inqTitle")) { 
+				sql = "select inqNum ,inqDate, inqTitle, fromNum, secret, depth from tblqna where "+keyField+" like ? order by ref, pos desc limit ?,10";
+				pstmt = con.prepareStatement(sql); 
+				pstmt.setString(1, "%"+keyWord+"%"); 
+				pstmt.setInt(2, start);
+			}
 			rs = pstmt.executeQuery();
 			while(rs.next()) {
 				QNABean bean = new QNABean();
@@ -144,6 +165,7 @@ public class QnaMgr {
 				bean.setInqTitle(rs.getString(3));
 				bean.setFromNum(rs.getInt(4));
 				bean.setSecret(rs.getString(5));
+				bean.setDepth(rs.getInt(6));
 				vlist.addElement(bean);
 				}
 		} catch (Exception e) {
@@ -166,7 +188,7 @@ public class QnaMgr {
 				A ="0";
 			}
 			con = pool.getConnection();
-			if(multi.getFilesystemName("filename")!=null) { //사용자가 파일 업로드 한 경우
+			if(multi.getFilesystemName("filename")!=null) { //����ڰ� ���� ���ε� �� ���
 				sql = "update tblQna set inqTitle=?, inqContent=?, filename=?, secret=? where inqNum=?";
 				pstmt = con.prepareStatement(sql);
 				pstmt.setString(1, multi.getParameter("inqTitle"));
@@ -212,11 +234,13 @@ public class QnaMgr {
 		return filename;
 	}
 	
-	public boolean deleteQna(int inqNum) {
+	public boolean deleteQna(int inqNum, int ref) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
 		String sql = null;
 		boolean flag = false;
+		int a=0;
+		System.out.println(inqNum+"    "+ ref);
 		try {
 			String filename = getFile(inqNum);
 			if(filename!=null) {
@@ -229,10 +253,15 @@ public class QnaMgr {
 				}
 			}
 			con = pool.getConnection();
-			sql = "delete from tblQna where inqNum = ?";
+			sql = "delete from tblQna where inqNum = ? or ref=? ";
 			pstmt = con.prepareStatement(sql);
 			pstmt.setInt(1, inqNum);
-			if(pstmt.executeUpdate()==1) flag=true;
+			pstmt.setInt(2, ref);
+			a=pstmt.executeUpdate();
+			if(a!=0) {
+				flag=true;
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -240,46 +269,4 @@ public class QnaMgr {
 		}
 		return flag;
 	}
-	// 문의 글에 대한 답변의 제목은 asdf로 고정 >> tblqna테이블에서 관리자가 작성한 답변 찾을 �� inqTitle='asdf'로 조건 검색 ??????????????????????
-	public boolean QnAreply(HttpServletRequest req) {
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		String sql = null;
-		boolean flag = false;
-		try {
-			con = pool.getConnection();
-			sql = "insert into tblQna(fromNum, inqTitle, inqContent, inqDate, ref) values(0000, 'asdf' , ?, now(), ?)";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, req.getParameter("QnAreply"));
-			pstmt.setInt(2, Integer.parseInt(req.getParameter("inqNum")));
-			if(pstmt.executeUpdate()==1) flag=true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			pool.freeConnection(con, pstmt);
-		}
-		return flag;
-	}
-	public QNABean QnAreplyRead(int inqNum) {
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		String sql = null;
-		QNABean bean = new QNABean();
-		System.out.println(inqNum);
-		try {
-			con = pool.getConnection();
-			sql = "SELECT inqcontent FROM tblqna WHERE ref=? AND inqTitle='asdf'";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setInt(1, inqNum);
-			rs = pstmt.executeQuery();
-			if(rs.next()) 
-				bean.setInqContent(rs.getString(1));
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			pool.freeConnection(con, pstmt, rs);
-		}
-		return bean;
-	}	
 }

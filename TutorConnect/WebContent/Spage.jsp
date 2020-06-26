@@ -133,6 +133,22 @@
       }
       
     </style>
+    <script>
+    function openChatting(num){
+		if(num==0){
+			alert("채팅 기능은 로그인 후 이용하실 수 있습니다.");
+		}else{
+			url="chatting.jsp?userNum="+num;
+			window.open(url, "chat", "width=1000, height=601, scrollbars=no, location=no, toobar=no, menubar=no");
+		}
+	}
+    function alreadyStudent(){
+		alert("이미 학생으로 등록되어 있습니다!");
+	}
+	function alreadyTeacher(){
+		alert("이미 선생님으로 등록되어 있습니다!");
+	}
+    </script>
   </head>
   <body>
     <header include-html="header.jsp"></header>
@@ -245,13 +261,26 @@
 				             <!-- 희망 과목 -->
 				                <div class="content" style="width:100%;">
 					                  <div class="s2i_desc">수업 가능 과목</div>
-					                  <div class="s2i_name"><%=sbean.getsSubject1() +", "+ sbean.getsSubject2() +", "+sbean.getsSubject3() %></div>      
+					                  <div class="s2i_name">
+					                  <%=sbean.getsSubject1()%>
+					                  <%if(sbean.getsSubject2()!=null){ %>
+					                  <%=", "+sbean.getsSubject2()%>
+					                  <%} %>
+					                  <%if(sbean.getsSubject3()!=null){ %>
+					                  <%=", "+sbean.getsSubject3() %>
+					                  <%} %></div>      
 				                </div>
 				                
 				             <!-- 희망 지역 -->
 				                <div class="content" style="width:100%;">
 				                  <div class="s2i_desc">희망 지역</div>
-				                  <div class="s2i_name"><%=sbean.getsArea1() +", "+ sbean.getsArea2() +", "+ sbean.getsArea3()%></div>
+				                  <div class="s2i_name"><%=sbean.getsArea1()%>
+				                  <%if(sbean.getsArea2()!=null){ %>
+					                  <%=", "+sbean.getsArea2()%>
+					                  <%} %>
+					                  <%if(sbean.getsArea3()!=null){ %>
+					                  <%=", "+sbean.getsArea3() %>
+					                  <%} %></div>
 				                </div>
 				              
 				              </div>
@@ -266,8 +295,15 @@
     		</br>
 				
 		<div class="content" style="justify-content: flex-end;width: 100%;">
-				<div class="s2i_desc"><a href="SpageProc.jsp?userNum=<%=userNum%>&studentNum=<%=studentNum%>">1:1 채팅하기</a></div>
-				<div class="s2i_desc" onclick=""><a href="SpageProc.jsp?userNum=<%=userNum%>&studentNum=<%=studentNum%>">찜하기</a></div>
+				<%if(userNum!=studentNum){ %>
+					<%if(userNum==0){ %>
+					<div class="s2i_desc"><a href="login.jsp">1:1 채팅하기</a></div>
+					<div class="s2i_desc" onclick=""><a href="login.jsp">찜하기</a></div>
+					<%}else{ %>
+					<div class="s2i_desc"><a href="SpageProc.jsp?userNum=<%=userNum%>&studentNum=<%=studentNum%>&flag=chat">1:1 채팅하기</a></div>
+					<div class="s2i_desc" onclick=""><a href="SpageProc.jsp?userNum=<%=userNum%>&studentNum=<%=studentNum%>&flag=not">찜하기</a></div>
+					<%} %>
+				<%} %>
 				<div class="s2i_desc" ><a href="javascript:history.back()">뒤로</a></div>
 		</div>
 		<br>

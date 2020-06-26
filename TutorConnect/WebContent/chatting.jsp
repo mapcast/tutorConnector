@@ -105,18 +105,16 @@
       }
       /*리스트 호버링 색*/
       .opponentList:hover {
-        background-color: white;
-        color: black;
+        background-color: rgb(88, 193, 147);
       }
     .opponentList1 {
         width: 100%;
-        height: 60px;
-		background-color: white;
+        height: 30px;
+		background-color:  rgb(58, 163, 117);
+		padding-top:-3px;
         font-size: 18px;
-        color: rgb(58, 163, 117);
-        padding:5px;
-        display:flex;
-        justify-content:space-between;
+        color: white;
+        text-align:center;
         font-weight:bold;
         border: 3px solid rgb(58, 163, 117);
       }
@@ -349,13 +347,8 @@
     <div id="contentWrap">
       <div id="listDiv">
       <div class="opponentList1">
-		        	<div class="opponentLeft">
-		        		<img src="img/class.png" class="smallCircleImage" style="width: 30px;height: 30px;margin: 10px;">
-			        	<div class="opponentName">
-			        			과외 커넥터 채팅 리스트
-			        	</div>
-		        	</div>
-		        </div>
+      	과외 커넥터 채팅 리스트
+	</div>
         <form method="get" name="opponentForm" action="chatting.jsp">
         	<input type="hidden" name="userNum" value="<%=userNum%>">
         	<input type="hidden" name="opponentNum" value="">
@@ -374,7 +367,7 @@
 	        %>
 	        
 	        <a href="javascript:selectOpponent(<%=oNum%>)">
-		        <div class="opponentList">
+		        <div class="opponentList" <%if(opponentNum==oNum){%>style="background-color:rgb(88, 193, 147)"<%} %>>
 		        	<div class="opponentLeft">
 			        	<%if(oImg.equals("")){ %><!-- 등록된 이미지가 없을때 -->
 			        	<img src="img/anonymous.jpg" class="smallCircleImage">

@@ -8,7 +8,11 @@ request.setCharacterEncoding("UTF-8");
 //String A = request.getParameter("userNum");
 int userNum = Integer.parseInt(request.getParameter("userNum"));
 int studentNum = Integer.parseInt(request.getParameter("studentNum"));
-
+boolean chatflag=false;
+String chat=request.getParameter("flag");
+if(chat.equals("chat")){
+	chatflag=true;
+}
 boolean A =  tmgr.isfollowed(userNum,studentNum);
 if(A){
 	%>
@@ -16,14 +20,23 @@ if(A){
 		alert("이미 찜한 상대입니다.");
 		location.href="Spage.jsp?userNum=<%=userNum%>&studentNum=<%=studentNum %>";
 	</script>
-	<%
-}else{
+	<%}else if(chatflag){
+		tmgr.following(userNum, studentNum);
+		%>
+	<script type="text/javascript">
+		alert("찜 등록 하였습니다.");
+		var url="chatting.jsp?userNum="+<%=userNum%>+"&opponentNum="+<%=studentNum%>;
+		window.open(url, "chat", "width=1000, height=601, scrollbars=no, location=no, toobar=no, menubar=no");
+		location.href="Spage.jsp?userNum=<%=userNum%>&studentNum=<%=studentNum %>"; 
+	</script>
+	<%}else{
 	tmgr.following(userNum, studentNum);
 	%>
 	<script type="text/javascript">
 		alert("찜 등록 하였습니다.");
 		location.href="Spage.jsp?userNum=<%=userNum%>&studentNum=<%=studentNum %>";
 	</script>
+	
 	<%
 }
 %>

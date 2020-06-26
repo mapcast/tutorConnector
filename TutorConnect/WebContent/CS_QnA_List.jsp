@@ -1,32 +1,35 @@
 <!-- UtilMgr 임포트 teamproject에서는 안됨!!!!! -->
+<%@page import="bean.UserBean"%>
 <%@page import="bean.QNABean"%>
 <%@page import="java.util.Vector"%>
 <%@page import="mgr.UtilMgr"%>
 <%@ page contentType="text/html; charset=EUC-KR"%>
 <jsp:useBean id="mgr" class="mgr.QnaMgr"/>
+<jsp:useBean id="umgr" class="mgr.UserMgr"/>
 <%
 	request.setCharacterEncoding("EUC-KR");
-
 	int userNum=0;
 	if(session.getAttribute("userNum")!=null){
 		userNum=(Integer)session.getAttribute("userNum");
-	}else{
-		%>
-		<script>
-			alert("로그인이 필요한 페이지 입니다.");
-			location.href="login.jsp";
-		</script>
-		<%
 	}
-	
-
-	int totalRecord = mgr.getTotalCount();;
+		
+	int totalRecord = 0;
 	int numPerPage = 10;//페이지당 레코드 개수
 	int pagePerBlock = 15;//블럭당 페이지 개수
 	int totalPage = 0;//총 페이지 개수
 	int totalBlock = 0;//총 블럭 개수
 	int nowPage = 1;//현재 페이지
 	int nowBlock = 1;//현재 블럭
+	
+	//검색에 필요한 변수
+	String keyField = "", keyWord = "";
+	//검색일때
+	if(request.getParameter("keyWord")!=null){
+		keyField = request.getParameter("keyField");
+		keyWord = request.getParameter("keyWord");
+	}
+	
+	totalRecord = mgr.getTotalCount(keyField, keyWord);
 	
 	if(request.getParameter("nowPage")!=null){
 		nowPage = UtilMgr.parseInt(request, "nowPage");
@@ -121,8 +124,6 @@
       }
       table, td {
       	border-collapse: collapse; 
-      	border-bottom: 1px solid black;
-      	
       }
       #btn {
       	display: inline-block;
@@ -137,15 +138,43 @@
 	    border-bottom-color: #e2e2e2;
 	    border-radius: .25em;
       }
+      #btn1 {
+      	display: inline-block;
+	    padding: .3em .5em;
+	    color: #fff;
+	    font-size: small;
+	    line-height: normal;
+	    vertical-align: middle;
+	    background-color: #58c189;
+	    cursor: pointer;
+	    border: 1px solid #ebebeb;
+	    border-bottom-color: #e2e2e2;
+	    border-radius: .25em;
+      }
       #inqtitle {
       	color: black;
       }
       th {
-      	background-color: #b8b8b8;
-      	text-align: left;
+      	background-color: #dbdbdb;
+      	text-align: center;
       }
        a.up{
 		color:darkgrey;
+		}
+       .review {
+        border-radius: 6px;
+        padding: 20px;        
+      }
+       .trth {
+			background-color: rgb(224, 224, 224);
+			text-align: center;
+			font-weight: 800;
+		}
+		      .trtd {
+			border-bottom: 2px solid rgb(224, 224, 224);
+			background-color: white;
+			text-align: center;
+			font-size: 13px;
 		}
     </style>
     <link
@@ -159,6 +188,14 @@
       type="text/css"
     />
     <script>
+    function gotoReport(){
+    	var userNum=<%=userNum%>
+    	if(userNum==0){
+    		alert("로그인 후에 이용 가능합니다.");
+    	}else{
+    		location.href="CS_QnA_Post.jsp?userNum="+userNum;
+    	}
+    }
     function openChatting(num){
 		if(num==0){
 			alert("채팅 기능은 로그인 후 이용하실 수 있습니다.");
@@ -185,11 +222,27 @@
 		document.detail.inqNum.value=inqNum;
 		document.detail.submit();
 		}
-	function updateQnA(inqNum, fromNum , secret) {
+	function showQnA(inqNum, fromNum, secret, depth) {
+		userNum = document.detail.userNum.value;
+		if(secret=="1"&&depth==1&&fromNum!=userNum) alert("비밀글은 작성자만 열람 가능");  
+		else if(depth==1) location.href='CS_QnA_Show.jsp?inqNum='+inqNum;
+		else if(secret=="1"&&fromNum!=userNum) alert("비밀글은 작성자만 열람 가능");  
+		else if(fromNum==userNum) location.href='CS_QnA_Show.jsp?inqNum='+inqNum;
+		else location.href='CS_QnA_Show.jsp?inqNum='+inqNum;  
+	}
+	/* function updateQnA(inqNum, fromNum , secret) {
 		userNum = document.detail.userNum.value;
 		if(userNum=="0000") location.href='CS_QnA_Update.jsp?inqNum='+inqNum;
 		else if(secret=="1"&&fromNum!=userNum) alert("비밀글은 작성자만 열람 가능");  
 		else location.href='CS_QnA_Update.jsp?inqNum='+inqNum;  
+	} */
+	function check() {
+		if(document.searchFrm.keyWord.value==""){
+			alert("검색어를 입력하세요.");
+			document.searchFrm.keyWord.focus();
+			return;
+		}
+		document.searchFrm.submit();
 	}
     </script>
   </head>
@@ -217,17 +270,25 @@
 				
 <!-- 게시물 번호 Start -->
 <%
-	Vector<QNABean> vlist = mgr.getQnaList(start);
+	Vector<QNABean> vlist = mgr.getQnaList(keyField, keyWord, start);
 	int listSize = vlist.size();
 	if(vlist.isEmpty()){
-		out.println("등록된 게시물이 없습니다.");
+		%>
+		 <div class="review" style="background:rgb(243, 243, 243); margin:0px 10%;">
+     			<h1 style="text-align: center;">
+					<span style="color:gray;">등록된</span>
+					<span style="color:rgb(88, 193, 137);">문의가 </span>
+					<span style="color:gray;">없습니다.</span>
+    			</h1>
+ 		</div> 
+		<%
 	}else{
 %>
 <table>
-	<tr>
-		<th width="100">작성일</th>
-		<th width="250">제목</th>
-		<th width="100">작성자</th>
+	<tr class="trth">
+		<th width="20%">작성일</th>
+		<th width="60%">제목</th>
+		<th width="10%">작성자</th>
 	</tr>
 	<%
 		for(int i=0;i<numPerPage;i++){
@@ -236,22 +297,23 @@
 			String inqDate = bean.getInqDate();
 			String inqTitle = bean.getInqTitle();
 			int fromNum = bean.getFromNum();
+			UserBean userInfo=umgr.getUser(fromNum);
 			int InqNum = bean.getInqNum();
+			int depth = bean.getDepth();
 	%>
-	<tr>
-		<td><%=inqDate %></td>
+	<tr class="trtd">
+		<td style="text-align: center;"><%=inqDate %></td>
 		<%-- javascript:location.href='CS_QnA_Update.jsp?inqNum=<%=bean.getInqNum()%>' --%>
-		<td><a id="inqtitle" href="javascript:updateQnA('<%=bean.getInqNum() %>','<%=bean.getFromNum()%>','<%=bean.getSecret()%>')">
-		<%=inqTitle %></a></td>
-		<td><%=fromNum %></td>
+		<td style="text-align:left;"><%for(int j=0;j<depth;j++){out.println("&nbsp;&nbsp;&nbsp;>>");} %>
+		&nbsp;&nbsp;&nbsp;<a id="inqtitle" href="javascript:showQnA('<%=bean.getInqNum() %>','<%=bean.getFromNum()%>','<%=bean.getSecret()%>', '<%=bean.getDepth()%>')">
+		<%=inqTitle %></a></td> <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
+		<td style="text-align: center;"><%=userInfo.getUserName() %></td>
 	</tr>
 	<%} //for %> 
 </table>
-<%} //if-else %>
 <!-- 게시물 번호 End>
-
 <!-- 페이징 및 블럭 Start -->
-<br>
+<table>
 <tr>
 	<td>
 	<%if(totalPage>0){ %>
@@ -280,22 +342,42 @@
 	<%} %> <!-- if(totalPage>0) -->
 	</td>
 </tr>
+</table>
+<%} //if-else %>
 <!-- 페이징 및 블럭 End -->
+<form  name="searchFrm">
+	<table  width="600" cellpadding="4" cellspacing="0">
+ 		<tr>
+  			<td align="center" valign="bottom">
+   				<select style="height: 23px" name="keyField" size="1" >
+    				<option value="userName"> 작성자</option>
+    				<option value="inqTitle"> 제목</option>
+   				</select>
+   				<input style="height: 23px" size="16" name="keyWord">
+   				<input id="btn1" type="button"  value="찾기" onClick="javascript:check()">
+   				<input type="hidden" name="nowPage" value="1">
+  			</td>
+ 		</tr>
+	</table>
+</form>
 <form name="readFrm">
 	<input type="hidden" name="totalRecord" value="<%=totalRecord%>">
 	<input type="hidden" name="nowPage" value="<%=nowPage%>">
+	<input type="hidden" name="keyField" value="<%=keyField%>">
+	<input type="hidden" name="keyWord" value="<%=keyWord%>">
 </form>
 <form name="detail" method="post">
 	<input type="hidden" name="userNum" value="<%=userNum%>">
 </form>
-<input id="btn" type="button" value="문의하기" onclick="javascript:location.href='CS_QnA_Post.jsp'">
+<br>
+<input id="btn" type="button" value="문의하기" onclick="gotoReport()">
 <p/>
 			</div>
         </div>
       </div>
     </div>
-	<div include-html="footer.jsp"></div>
-	<footer include-html="footer1.jsp"></footer>
+    <div include-html="footer.jsp"></div>
+    <div include-html="footer1.jsp"></div>
     <script>
       includeHTML();
     </script>

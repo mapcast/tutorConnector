@@ -1,6 +1,11 @@
 package mgr;
 
 import java.sql.*;
+import java.util.Vector;
+
+import bean.ReviewBean;
+
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
@@ -42,7 +47,7 @@ public class StudentMgr {
 			System.out.println(keyWord+" "+start+" "+cnt);
 
 			if(flag==true) {
-			//request ¿ä±¸Á¶°Ç
+			//request ìš”êµ¬ì¡°ê±´
 				String[] area = req.getParameterValues("area");
 				String area1 = "";
 				
@@ -52,9 +57,9 @@ public class StudentMgr {
 				
 				area1 = area1.substring(0, area1.length()-4);
 				
-				//tArea1=¼­¿ï¿ë»ê±¸ or tArea2=¼­¿ï¿ë»ê±¸ or tArea3=¼­¿ï¿ë»ê±¸ or tArea1=¼­¿ï¸¶Æ÷±¸ or tArea2=¼­¿ï¸¶Æ÷±¸ or tArea3=¼­¿ï¸¶Æ÷±¸
+				//tArea1=ì„œìš¸ìš©ì‚°êµ¬ or tArea2=ì„œìš¸ìš©ì‚°êµ¬ or tArea3=ì„œìš¸ìš©ì‚°êµ¬ or tArea1=ì„œìš¸ë§ˆí¬êµ¬ or tArea2=ì„œìš¸ë§ˆí¬êµ¬ or tArea3=ì„œìš¸ë§ˆí¬êµ¬
 				
-				//Èñ¸Á°ú¸ñ
+				//í¬ë§ê³¼ëª©
 				String[] subject = req.getParameterValues("subject");
 				String subject1 ="";
 									
@@ -63,30 +68,30 @@ public class StudentMgr {
 				
 				subject1 = subject1.substring(0, subject1.length()-4);
 
-				//°ú¿Üºñ ºÒ·¯¿À±â
+				//ê³¼ì™¸ë¹„ ë¶ˆëŸ¬ì˜¤ê¸°
 				
 				String fbtn = req.getParameter("fbtn").substring(0, 2);
 				String sfee = "";
-				if(!fbtn.equals("ÇùÀÇ")) sfee =" and s2.sFee<="+fbtn;
+				if(!fbtn.equals("í˜‘ì˜")) sfee =" and s2.sFee<="+fbtn;
 				
 				//and t2.tFee<=30
 				
-				//¼ºº° ºÒ·¯¿À±â
+				//ì„±ë³„ ë¶ˆëŸ¬ì˜¤ê¸°
 				String gbtn = req.getParameter("gbtn");
-				if(gbtn.equals("³²ÀÚ")) gbtn=" and s1.userGender=1";
-				else if(gbtn.equals("¿©ÀÚ")) gbtn=" and s1.userGender=2";
-				else if(gbtn.equals("ÀüÃ¼")) gbtn="";
+				if(gbtn.equals("ë‚¨ì")) gbtn=" and s1.userGender=1";
+				else if(gbtn.equals("ì—¬ì")) gbtn=" and s1.userGender=2";
+				else if(gbtn.equals("ì „ì²´")) gbtn="";
 
 				System.out.print(gbtn);
 				
 				//and t1.userGender=1			
 				
-				//Èñ¸ÁÈ½¼ö
+				//í¬ë§íšŸìˆ˜
 				
 				String dbtn = req.getParameter("dbtn");
 				String dcount ="";
-				if(!dbtn.equals("ÇùÀÇ")) dcount = " and s2.sDay='"+dbtn+"'"; 
-				// s2.sDay='ÁÖ2È¸'
+				if(!dbtn.equals("í˜‘ì˜")) dcount = " and s2.sDay='"+dbtn+"'"; 
+				// s2.sDay='ì£¼2íšŒ'
 				
 				
 				sql = "SELECT s1.userNum, s2.sNickname, userGender, s2.sRecord, s2.sSubject1, s2.sSubject2, s2.sSubject3, s2.sDay, s2.sTime, s2.sArea1, s2.sArea2, s2.sArea3"
@@ -98,10 +103,10 @@ public class StudentMgr {
 				System.out.println(sql);
 				pstmt = con.prepareStatement(sql);
 			
-			//°Ë»öÇÏ±â
+			//ê²€ìƒ‰í•˜ê¸°
 			}//if
 			else if(keyWord.trim().equals("")||keyWord==null) {
-				//°Ë»öÀÌ ¾Æ´Ñ°æ¿ì
+				//ê²€ìƒ‰ì´ ì•„ë‹Œê²½ìš°
 				sql = "SELECT * from tblStudent,tbluser where tblStudent.userNum = tbluser.userNum ORDER by tblStudent.userNum desc LIMIT ?,?";
 				pstmt = con.prepareStatement(sql);
 				pstmt.setInt(1, start);
@@ -109,7 +114,7 @@ public class StudentMgr {
 				}
 			
 			else {
-					//°Ë»öÀÎ °æ¿ì
+					//ê²€ìƒ‰ì¸ ê²½ìš°
 					sql = "select * from tblteacher,tbluser where tblStudent.userNum = tbluser.userNum and sNickname like ? limit ?,?";
 					pstmt = con.prepareStatement(sql);
 					pstmt.setString(1, "%"+keyWord+"%");
@@ -121,12 +126,12 @@ public class StudentMgr {
 			while(rs.next()) {
 				StudentBean sbean = new StudentBean();
 				sbean.setUserNum(rs.getInt("userNum"));;
-				sbean.setsRecord(rs.getInt("sRecord"));//ÃÖÁ¾ ÇĞ·Â
-				sbean.setsDay(rs.getString("sDay"));//Èñ¸Á ¿äÀÏ
-				sbean.setsSubject1(rs.getString("sSubject1")); //±³½À °ú¸ñ1
-				sbean.setsArea1(rs.getString("sArea1"));//Èñ¸Á Áö¿ª1
-				sbean.setsTime(rs.getString("sTime"));//Èñ¸Á ½Ã°£
-				sbean.setsNickname(rs.getString("sNickname"));//´Ğ³×ÀÓ
+				sbean.setsRecord(rs.getInt("sRecord"));//ìµœì¢… í•™ë ¥
+				sbean.setsDay(rs.getString("sDay"));//í¬ë§ ìš”ì¼
+				sbean.setsSubject1(rs.getString("sSubject1")); //êµìŠµ ê³¼ëª©1
+				sbean.setsArea1(rs.getString("sArea1"));//í¬ë§ ì§€ì—­1
+				sbean.setsTime(rs.getString("sTime"));//í¬ë§ ì‹œê°„
+				sbean.setsNickname(rs.getString("sNickname"));//ë‹‰ë„¤ì„
 				sbean.setsYear(rs.getInt("sYear"));
 				
 				slist.addElement(sbean);
@@ -140,7 +145,7 @@ public class StudentMgr {
 		
 	}
 	
-	//È¸¿ø Total Count : ÃÑ È¸¿ø¼ö
+	//íšŒì› Total Count : ì´ íšŒì›ìˆ˜
 	public int getTotalCount(HttpServletRequest req,String keyWord) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
@@ -158,14 +163,14 @@ public class StudentMgr {
 			}
 			
 			if(flag==true) {
-			//request ¿ä±¸Á¶°Ç
+			//request ìš”êµ¬ì¡°ê±´
 				
 				String[] area = req.getParameterValues("area");
 				String area1 = "where ";
 				String area11 = area[0].substring(2, area[0].length());
 				String area12 = area[0].substring(0, 2);
 
-				if(area11.equals("ÀüÃ¼")) {
+				if(area11.equals("ì „ì²´")) {
 					area1 += " sArea1 like '%"+area12+"%'";
 				}else {
 					for(int i =0; i<area.length;i++){			
@@ -175,9 +180,9 @@ public class StudentMgr {
 				}
 				
 						
-				//tArea1=¼­¿ï¿ë»ê±¸ or tArea2=¼­¿ï¿ë»ê±¸ or tArea3=¼­¿ï¿ë»ê±¸ or tArea1=¼­¿ï¸¶Æ÷±¸ or tArea2=¼­¿ï¸¶Æ÷±¸ or tArea3=¼­¿ï¸¶Æ÷±¸
+				//tArea1=ì„œìš¸ìš©ì‚°êµ¬ or tArea2=ì„œìš¸ìš©ì‚°êµ¬ or tArea3=ì„œìš¸ìš©ì‚°êµ¬ or tArea1=ì„œìš¸ë§ˆí¬êµ¬ or tArea2=ì„œìš¸ë§ˆí¬êµ¬ or tArea3=ì„œìš¸ë§ˆí¬êµ¬
 				
-				//Èñ¸Á°ú¸ñ
+				//í¬ë§ê³¼ëª©
 				String[] subject = req.getParameterValues("subject");
 				String subject1 ="";
 									
@@ -186,28 +191,28 @@ public class StudentMgr {
 				
 				subject1 = subject1.substring(0, subject1.length()-4);
 
-				//°ú¿Üºñ ºÒ·¯¿À±â
+				//ê³¼ì™¸ë¹„ ë¶ˆëŸ¬ì˜¤ê¸°
 				
 				String fbtn = req.getParameter("fbtn").substring(0, 2);
 				String sfee = "";
-				if(!fbtn.equals("ÇùÀÇ")) sfee =" and s2.sFee<="+fbtn;
+				if(!fbtn.equals("í˜‘ì˜")) sfee =" and s2.sFee<="+fbtn;
 				
 				//and t2.tFee<=30
 				
-				//¼ºº° ºÒ·¯¿À±â
+				//ì„±ë³„ ë¶ˆëŸ¬ì˜¤ê¸°
 				String gbtn = req.getParameter("gbtn");
-				if(gbtn.equals("³²ÀÚ")) gbtn=" and s1.userGender=1";
-				else if(gbtn.equals("¿©ÀÚ")) gbtn=" and s1.userGender=2";
-				else if(gbtn.equals("ÀüÃ¼")) gbtn="";
+				if(gbtn.equals("ë‚¨ì")) gbtn=" and s1.userGender=1";
+				else if(gbtn.equals("ì—¬ì")) gbtn=" and s1.userGender=2";
+				else if(gbtn.equals("ì „ì²´")) gbtn="";
 
 				//and t1.userGender=1			
 				
-				//Èñ¸ÁÈ½¼ö
+				//í¬ë§íšŸìˆ˜
 				
 				String dbtn = req.getParameter("dbtn");
 				String dcount ="";
-				if(!dbtn.equals("ÇùÀÇ")) dcount = " and s2.sDay='"+dbtn+"'"; 
-				// s2.sDay='ÁÖ2È¸'
+				if(!dbtn.equals("í˜‘ì˜")) dcount = " and s2.sDay='"+dbtn+"'"; 
+				// s2.sDay='ì£¼2íšŒ'
 				
 				
 				sql = "SELECT count(*)"
@@ -218,17 +223,17 @@ public class StudentMgr {
 						
 				pstmt = con.prepareStatement(sql);
 			
-			//°Ë»öÇÏ±â
+			//ê²€ìƒ‰í•˜ê¸°
 			}//if
 			else if(keyWord.trim().equals("")||keyWord==null) {
-				//°Ë»öÀÌ ¾Æ´Ñ°æ¿ì
+				//ê²€ìƒ‰ì´ ì•„ë‹Œê²½ìš°
 				sql = "SELECT count(*) from tblStudent,tbluser where tblStudent.userNum = tbluser.userNum ORDER by tblStudent.userNum desc";
 				pstmt = con.prepareStatement(sql);
 
 				}
 			
 			else {
-					//°Ë»öÀÎ °æ¿ì
+					//ê²€ìƒ‰ì¸ ê²½ìš°
 					sql = "select count(*) from tblStudent,tbluser where tblStudent.userNum = tbluser.userNum and sNickname like ?";
 					pstmt = con.prepareStatement(sql);
 					pstmt.setString(1, "%"+keyWord+"%");
@@ -267,7 +272,7 @@ public class StudentMgr {
 			System.out.println(keyWord+" "+start+" "+cnt);
 
 			if(flag==true) {
-			//request ¿ä±¸Á¶°Ç
+			//request ìš”êµ¬ì¡°ê±´
 				String[] area = req.getParameterValues("area");
 				String area1 = "";
 				
@@ -277,9 +282,9 @@ public class StudentMgr {
 				
 				area1 = area1.substring(0, area1.length()-4);
 				
-				//tArea1=¼­¿ï¿ë»ê±¸ or tArea2=¼­¿ï¿ë»ê±¸ or tArea3=¼­¿ï¿ë»ê±¸ or tArea1=¼­¿ï¸¶Æ÷±¸ or tArea2=¼­¿ï¸¶Æ÷±¸ or tArea3=¼­¿ï¸¶Æ÷±¸
+				//tArea1=ì„œìš¸ìš©ì‚°êµ¬ or tArea2=ì„œìš¸ìš©ì‚°êµ¬ or tArea3=ì„œìš¸ìš©ì‚°êµ¬ or tArea1=ì„œìš¸ë§ˆí¬êµ¬ or tArea2=ì„œìš¸ë§ˆí¬êµ¬ or tArea3=ì„œìš¸ë§ˆí¬êµ¬
 				
-				//Èñ¸Á°ú¸ñ
+				//í¬ë§ê³¼ëª©
 				String[] subject = req.getParameterValues("subject");
 				String subject1 ="";
 									
@@ -288,30 +293,30 @@ public class StudentMgr {
 				
 				subject1 = subject1.substring(0, subject1.length()-4);
 
-				//°ú¿Üºñ ºÒ·¯¿À±â
+				//ê³¼ì™¸ë¹„ ë¶ˆëŸ¬ì˜¤ê¸°
 				
 				String fbtn = req.getParameter("fbtn").substring(0, 2);
 				String sfee = "";
-				if(!fbtn.equals("ÇùÀÇ")) sfee =" and s2.sFee<="+fbtn;
+				if(!fbtn.equals("í˜‘ì˜")) sfee =" and s2.sFee<="+fbtn;
 				
 				//and t2.tFee<=30
 				
-				//¼ºº° ºÒ·¯¿À±â
+				//ì„±ë³„ ë¶ˆëŸ¬ì˜¤ê¸°
 				String gbtn = req.getParameter("gbtn");
-				if(gbtn.equals("³²ÀÚ")) gbtn=" and s1.userGender=1";
-				else if(gbtn.equals("¿©ÀÚ")) gbtn=" and s1.userGender=2";
-				else if(gbtn.equals("ÀüÃ¼")) gbtn="";
+				if(gbtn.equals("ë‚¨ì")) gbtn=" and s1.userGender=1";
+				else if(gbtn.equals("ì—¬ì")) gbtn=" and s1.userGender=2";
+				else if(gbtn.equals("ì „ì²´")) gbtn="";
 
 				System.out.print(gbtn);
 				
 				//and t1.userGender=1			
 				
-				//Èñ¸ÁÈ½¼ö
+				//í¬ë§íšŸìˆ˜
 				
 				String dbtn = req.getParameter("dbtn");
 				String dcount ="";
-				if(!dbtn.equals("ÇùÀÇ")) dcount = " and s2.sDay='"+dbtn+"'"; 
-				// s2.sDay='ÁÖ2È¸'
+				if(!dbtn.equals("í˜‘ì˜")) dcount = " and s2.sDay='"+dbtn+"'"; 
+				// s2.sDay='ì£¼2íšŒ'
 				
 				
 				sql = "SELECT s1.userNum, s2.sNickname, userGender, s2.sRecord, s2.sSubject1, s2.sSubject2, s2.sSubject3, s2.sDay, s2.sTime, s2.sArea1, s2.sArea2, s2.sArea3"
@@ -323,10 +328,10 @@ public class StudentMgr {
 				System.out.println(sql);
 				pstmt = con.prepareStatement(sql);
 			
-			//°Ë»öÇÏ±â
+			//ê²€ìƒ‰í•˜ê¸°
 			}//if
 			else if(keyWord.trim().equals("")||keyWord==null) {
-				//°Ë»öÀÌ ¾Æ´Ñ°æ¿ì
+				//ê²€ìƒ‰ì´ ì•„ë‹Œê²½ìš°
 				sql = "SELECT * from tblStudent,tbluser where tblStudent.userNum = tbluser.userNum ORDER by tblStudent.userNum desc LIMIT ?,?";
 				pstmt = con.prepareStatement(sql);
 				pstmt.setInt(1, start);
@@ -334,7 +339,7 @@ public class StudentMgr {
 				}
 			
 			else {
-					//°Ë»öÀÎ °æ¿ì
+					//ê²€ìƒ‰ì¸ ê²½ìš°
 					sql = "select * from tblteacher,tbluser where tblStudent.userNum = tbluser.userNum and sNickname like ? limit ?,?";
 					pstmt = con.prepareStatement(sql);
 					pstmt.setString(1, "%"+keyWord+"%");
@@ -377,20 +382,20 @@ public class StudentMgr {
 			
 			while(rs.next()) {
 				
-				bean.setUserNum(rs.getInt("userNum")); //À¯Àú¾ÆÀÌµğ
+				bean.setUserNum(rs.getInt("userNum")); //ìœ ì €ì•„ì´ë””
 				bean.setsRecord(rs.getInt("sRecord")); 
-				bean.setsSubject1(rs.getString("sSubject1"));//Èñ¸Á°ú¸ñ1
-				bean.setsSubject2(rs.getString("sSubject2"));//Èñ¸Á°ú¸ñ2
-				bean.setsSubject3(rs.getString("sSubject3"));//Èñ¸Á°ú¸ñ3
-				bean.setsArea1(rs.getString("sArea1"));//Èñ¸ÁÁö¿ª1
-				bean.setsArea2(rs.getString("sArea2"));//Èñ¸ÁÁö¿ª2
-				bean.setsArea3(rs.getString("sArea3"));//Èñ¸ÁÁö¿ª3
-				bean.setsDay(rs.getString("sDay"));//Èñ¸ÁÈ½¼ö
-				bean.setsTime(rs.getString("sTime")); //Èñ¸Á °ú¿Ü ½Ã°£
+				bean.setsSubject1(rs.getString("sSubject1"));//í¬ë§ê³¼ëª©1
+				bean.setsSubject2(rs.getString("sSubject2"));//í¬ë§ê³¼ëª©2
+				bean.setsSubject3(rs.getString("sSubject3"));//í¬ë§ê³¼ëª©3
+				bean.setsArea1(rs.getString("sArea1"));//í¬ë§ì§€ì—­1
+				bean.setsArea2(rs.getString("sArea2"));//í¬ë§ì§€ì—­2
+				bean.setsArea3(rs.getString("sArea3"));//í¬ë§ì§€ì—­3
+				bean.setsDay(rs.getString("sDay"));//í¬ë§íšŸìˆ˜
+				bean.setsTime(rs.getString("sTime")); //í¬ë§ ê³¼ì™¸ ì‹œê°„
 				bean.setsFee(rs.getInt("sFee"));
 				bean.setsNickname(rs.getString("sNickname"));
-				bean.setsGrade(rs.getInt("sGrade")); //ÇĞ»ıµî±Ş(ÃßÈÄ »ç¿ë)
-				bean.setsOpen(rs.getInt("sOpen")); //Á¤º¸°ø°³¿©ºÎ
+				bean.setsGrade(rs.getInt("sGrade")); //í•™ìƒë“±ê¸‰(ì¶”í›„ ì‚¬ìš©)
+				bean.setsOpen(rs.getInt("sOpen")); //ì •ë³´ê³µê°œì—¬ë¶€
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -465,5 +470,131 @@ public class StudentMgr {
 		}
 		return bean;
 
+	}
+	
+	public boolean isStudent(int userNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "select userNum from tblStudent where userNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				flag=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return flag;
+	}
+	
+	public void deleteStudent(int userNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "delete from tblstudent where userNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, userNum);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+	}
+	
+	public boolean updateStudent(StudentBean bean) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		boolean flag=false;
+		String subject2=null, subject3=null, area2=null, area3=null;
+		if(bean.getsSubject2()!=null&&!bean.getsSubject2().equals("0")) {
+			subject2=bean.getsSubject2();
+		}
+		if(bean.getsSubject3()!=null&&!bean.getsSubject3().equals("0")) {
+			subject3=bean.getsSubject3();
+		}
+		if(bean.getsArea2()!=null&&!bean.getsArea2().equals("ÃÂ¦Â°Ã…0")) {
+			area2=bean.getsArea2();
+		}
+		if(bean.getsArea3()!=null&&!bean.getsArea3().equals("ÃÂ¦Â°Ã…0")) {
+			area3=bean.getsArea3();
+		}
+		try {
+			con = pool.getConnection();
+			sql = "update tblstudent set sNickname=?, sRecord=?, sYear=?, sSubject1=?, sSubject2=?, sSubject3=?,"
+					+ " sArea1=?, sArea2=?, sArea3=?, sDay=?, sTime=?, sFee=?, sOpen=? where userNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, bean.getsNickname());
+			pstmt.setInt(2, bean.getsRecord());
+			pstmt.setInt(3, bean.getsYear());
+			pstmt.setString(4, bean.getsSubject1());
+			pstmt.setString(5, subject2);
+			pstmt.setString(6, subject3);
+			pstmt.setString(7, bean.getsArea1());
+			pstmt.setString(8, area2);
+			pstmt.setString(9, area3);
+			pstmt.setString(10, bean.getsDay());
+			pstmt.setString(11, bean.getsTime());
+			pstmt.setInt(12, bean.getsFee());
+			pstmt.setInt(13, bean.getsOpen());
+			pstmt.setInt(14, bean.getUserNum());
+			if(pstmt.executeUpdate()==1) {
+				flag=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return flag;
+	}
+	public boolean registerStudent(String sql) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			pstmt = con.prepareStatement(sql);
+			if(pstmt.executeUpdate()==1) flag=true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return flag;
+	}
+	public boolean isExists(String sNickName) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "select usernum from tblstudent where sNickName=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, sNickName);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				flag=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return flag;
 	}
 }

@@ -33,20 +33,18 @@ int nowBlock = 1;//현재 블럭
 			int start = (nowPage*numPerPage)-numPerPage;
 			int cnt = numPerPage;
 	
+
+	int userNum = Integer.parseInt(request.getParameter("userNum"));
+	int teacherNum = Integer.parseInt(request.getParameter("teacherNum"));
+	
 	// 현재 toNum에 작성된 총 리뷰 수
-	totalRecord = rMgr.getReviewCnt(3);
+	totalRecord = rMgr.getReviewCnt(teacherNum);
 	//전체페이지 개수
 	totalPage = (int)Math.ceil((double)totalRecord/numPerPage);
 	//전체블럭 개수
 	totalBlock = (int)Math.ceil((double)totalPage/pagePerBlock);
 	//현재블럭
 	nowBlock = (int)Math.ceil((double)nowPage/pagePerBlock);
-
-	
-	int userNum = Integer.parseInt(request.getParameter("userNum"));
-	int teacherNum = Integer.parseInt(request.getParameter("teacherNum"));
-	
-
 %>
 
 
@@ -101,7 +99,6 @@ int nowBlock = 1;//현재 블럭
         width: 200px;
         height: 200px;
         border-radius: 5px;
-        border: 3px solid red;
         margin: 0 25px;
       }
       .reviewDescWrap {
@@ -218,8 +215,27 @@ int nowBlock = 1;//현재 블럭
 		margin: 0px 3px;
 	
 		}
+		video:focus{
+			outline:none;
+		}
       
     </style>
+    <script>
+    function openChatting(num){
+		if(num==0){
+			alert("채팅 기능은 로그인 후 이용하실 수 있습니다.");
+		}else{
+			url="chatting.jsp?userNum="+num;
+			window.open(url, "chat", "width=1000, height=601, scrollbars=no, location=no, toobar=no, menubar=no");
+		}
+	}
+    function alreadyStudent(){
+		alert("이미 학생으로 등록되어 있습니다!");
+	}
+	function alreadyTeacher(){
+		alert("이미 선생님으로 등록되어 있습니다!");
+	}
+    </script>
   </head>
   <body>
     <header include-html="header.jsp"></header>
@@ -309,16 +325,30 @@ int nowBlock = 1;//현재 블럭
 				               		</div>
 				                </div>
 				                
-				             <!-- 희망 과목 -->
+				                
+				             							<!-- 희망 과목 -->
 				                <div class="content" style="width:100%;">
 					                  <div class="s2i_desc">수업 가능 과목</div>
-					                  <div class="s2i_name"><%=bean.gettSubject1() +", "+ bean.gettSubject2() +", "+bean.gettSubject3() %></div>      
+					                  <div class="s2i_name">
+					                  <%=bean.gettSubject1()%>
+					                  <%if(bean.gettSubject2()!=null){ %>
+					                  <%=", "+bean.gettSubject2()%>
+					                  <%} %>
+					                  <%if(bean.gettSubject3()!=null){ %>
+					                  <%=", "+bean.gettSubject3() %>
+					                  <%} %></div>      
 				                </div>
 				                
 				             <!-- 희망 지역 -->
 				                <div class="content" style="width:100%;">
 				                  <div class="s2i_desc">희망 지역</div>
-				                  <div class="s2i_name"><%=bean.gettArea1() +", "+ bean.gettArea2() +", "+ bean.gettArea3()%></div>
+				                  <div class="s2i_name"><%=bean.gettArea1()%>
+				                  <%if(bean.gettArea2()!=null){ %>
+					                  <%=", "+bean.gettArea2()%>
+					                  <%} %>
+					                  <%if(bean.gettArea3()!=null){ %>
+					                  <%=", "+bean.gettArea3() %>
+					                  <%} %></div>
 				                </div>
 				              
 				              </div>
@@ -361,7 +391,7 @@ int nowBlock = 1;//현재 블럭
     			<%}%>
     				
 		          <div class="content" style="width:100%;padding-top: 10px;">				
-						<video src="./video/<%=bean.gettFile() %>" style="margin:auto;padding-top: 10px;" width="640" controls>브라우저가 지원하지 못할 시 표시할 내용</video>
+						<video src="img/<%=bean.gettFile() %>" style="margin:auto;padding-top: 10px;" width="640" controls>브라우저가 지원하지 못할 시 표시할 내용</video>
     				</div>
 	    		</div>	
  <!-- 동영상 소개 끝 -->   			    			    				
@@ -490,13 +520,22 @@ int nowBlock = 1;//현재 블럭
     	<form name="readFrm">
 			<input type="hidden" name="nowPage" value="<%=nowPage%>"> 
 			<input type="hidden" name="numPerPage" value="<%=numPerPage%>"> 
+			<input type="hidden" name="userNum" value="<%=userNum%>">
+			<input type="hidden" name="teacherNum" value="<%=teacherNum%>">
 		</form>		
 		
 				<!-- 댓글 달기 끝-->
 				
 		<div class="content" style="justify-content: flex-end;width: 100%;">
-				<div class="s2i_desc"><a href="TpageProc.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>">1:1 채팅하기</a></div>
-				<div class="s2i_desc" onclick=""><a href="TpageProc.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>">찜하기</a></div>
+				<%if(userNum!=teacherNum){ %>
+					<%if(userNum==0){ %>
+					<div class="s2i_desc"><a href="login.jsp">1:1 채팅하기</a></div>
+					<div class="s2i_desc" onclick=""><a href="login.jsp">찜하기</a></div>
+					<%}else{ %>
+					<div class="s2i_desc"><a href="TpageProc.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>&flag=chat">1:1 채팅하기</a></div>
+					<div class="s2i_desc" onclick=""><a href="TpageProc.jsp?userNum=<%=userNum%>&teacherNum=<%=teacherNum%>&flag=not">찜하기</a></div>
+					<%} %>
+				<%} %>
 				<div class="s2i_desc" ><a href="javascript:history.back()">뒤로</a></div>
 		</div>
 		

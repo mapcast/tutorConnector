@@ -170,6 +170,30 @@ public class ReviewMgr {
 		}
 		return flag;
 	}
+	public boolean insertReview(ReviewBean bean) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "insert into tblreview(reviewContent, reviewRate, ip, fromNum, toNum) values(?,?,?,?,?)";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, bean.getReviewContent());
+			pstmt.setInt(2, bean.getReviewRate());
+			pstmt.setString(3, bean.getIp());
+			pstmt.setInt(4, bean.getFromNum());
+			pstmt.setInt(5, bean.getToNum());
+			if(pstmt.executeUpdate()==1) {
+				flag=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt);
+		}
+		return flag;
+	}
 	public void deleteReview(int fromNum, int toNum) {
 		Connection con = null;
 		PreparedStatement pstmt = null;
@@ -186,5 +210,29 @@ public class ReviewMgr {
 		} finally {
 			pool.freeConnection(con, pstmt);
 		}
+	}
+	public boolean hasReview(int fromNum, int toNum) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql = null;
+		boolean flag=false;
+		try {
+			con = pool.getConnection();
+			sql = "select * from tblReview where fromNum=? and toNum=?";
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, fromNum);
+			pstmt.setInt(2, toNum);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				flag=true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			pool.freeConnection(con, pstmt, rs);
+		}
+		return flag;
+
 	}
 }

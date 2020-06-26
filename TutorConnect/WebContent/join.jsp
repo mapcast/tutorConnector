@@ -28,7 +28,7 @@
       }
       .joinFlex {
         display: flex;
-        padding: 0 14vw;
+        padding-left:14vw;
         margin-bottom: 30px;
       }
       #title {
@@ -105,6 +105,15 @@
         color: white;
         font-weight: 800;
       }
+      .idCheckButton{
+      	margin-left:20px;
+      	border:none;
+      	background-color: rgb(88, 193, 137);
+      	color:white;
+      	border-radius:4px;
+      	cursor:pointer;
+      }
+      
     </style>
     <link
       href="//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css"
@@ -123,13 +132,16 @@
     		alert("아이디를 입력하세요!");
     		form.userId.focus();
     	}
+    	 else if(form.isExsistsFlag.value!="yes"){
+     		alert("id체크를 진행해주세요.");
+     	}
     	else if(form.userPwd.value==""){
     		alert("비밀번호를 입력하세요!");
-    		form.userPwd.focues();
+    		form.userPwd.focus();
     	}
     	else if(form.pwdCheck.value==""){
     		alert("비밀번호 확인을 입력하세요!");
-    		form.pwdCheck.focues();
+    		form.pwdCheck.focus();
     	}
     	else if(form.userPwd.value!=form.pwdCheck.value){
     		alert("입력하신 비밀번호가 다릅니다!");
@@ -137,23 +149,23 @@
     	}
     	else if(form.userName.value==""){
     		alert("이름을 입력하세요!");
-    		form.userName.focues();
+    		form.userName.focus();
     	}
     	else if(form.userAddress.value==""){
     		alert("주소를 입력하세요!");
     	}
     	else if(form.userPhone.value==""){
     		alert("전화번호를 입력하세요!");
-    		form.userPhone.focues();
+    		form.userPhone.focus();
     	}
     	else if(form.userEmail.value==""){
     		alert("이메일을 입력하세요!");
-    		form.userEmail.focues();
+    		form.userEmail.focus();
     	}
     	else if(form.userBirth.value.length<8){
      		alert("8자리의 생년월일을 입력해주세요!");
-     		form.userBirth.focues();
-     	} 
+     		form.userBirth.focus();
+     	}
     	else{
     		form.submit();
     	} 
@@ -163,6 +175,19 @@
   	}
   	function alreadyTeacher(){
   		alert("이미 선생님으로 등록되어 있습니다!");
+  	}
+  	function idCheck(){
+  		var id=document.joinFrm.userId.value;
+  		var _width = '300';
+	    var _height = '150';
+	    var _left = Math.ceil(( window.screen.width - _width )/2);
+	    var _top = Math.ceil(( window.screen.width - _height )/4); 
+	    if(id == ""){
+			alert("아이디를 입력해주세요");
+		}else{
+			url="joinIdCheck.jsp?userId="+id;
+			window.open(url,"check", 'width='+ _width +', height='+ _height +', left=' + _left + ', top='+ _top );
+		}
   	}
      </script>
 <!--     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script> -->
@@ -245,11 +270,13 @@
     <div id="contentWrap">
       <h1 id="title">회원가입</h1>
       <form method="post" name="joinFrm" action="joinProc.jsp">
+      <input type="hidden" name="isExsistsFlag" value="0">
         <div class="joinFlex">
           <div class="inputDesc">아이디</div>
           <div class="inputBox">
             <input type="text" name="userId" class="input" value="" placeholder="아이디" />
           </div>
+          <input type="button" class="idCheckButton" style="width:90px;" value="ID체크" onClick="idCheck()"/>
         </div>
         <div class="joinFlex">
           <div class="inputDesc">비밀번호</div>
