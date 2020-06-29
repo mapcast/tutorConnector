@@ -80,7 +80,6 @@ public class UserMgr {
 				bean.setUserBirth(rs.getString(8));
 				bean.setUserGender(rs.getString(9));
 				bean.setUserAddress2(rs.getString(10));
-				bean.setUserLastMessage(rs.getInt(11));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -269,23 +268,16 @@ public class UserMgr {
 			pool.freeConnection(con, pstmt);
 		}
 	}
-	public void updateUserLastMessage(int userNum, int userLastMessage) {
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		String sql = null;
-		try {
-			con = pool.getConnection();
-			sql = "update tbluser set userlastmessage=? where userNum=?";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setInt(1, userLastMessage);
-			pstmt.setInt(2, userNum);
-			pstmt.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			pool.freeConnection(con, pstmt);
-		}
-	}
+
+	/*
+	 * public void updateUserLastMessage(int userNum, int userLastMessage) {
+	 * Connection con = null; PreparedStatement pstmt = null; String sql = null; try
+	 * { con = pool.getConnection(); sql =
+	 * "update tbluser set userlastmessage=? where userNum=?"; pstmt =
+	 * con.prepareStatement(sql); pstmt.setInt(1, userLastMessage); pstmt.setInt(2,
+	 * userNum); pstmt.executeUpdate(); } catch (Exception e) { e.printStackTrace();
+	 * } finally { pool.freeConnection(con, pstmt); } }
+	 */
 	public boolean isExists(String userId) {
 		Connection con = null;
 		PreparedStatement pstmt = null;

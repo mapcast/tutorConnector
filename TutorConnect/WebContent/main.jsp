@@ -15,7 +15,7 @@
 		if(session.getAttribute("userNum")!=null){
 			userNum=(Integer)session.getAttribute("userNum");
 			bean=mgr.getUser(userNum);
-			userLastMessage=bean.getUserLastMessage();
+			/* userLastMessage=bean.getUserLastMessage(); */
 			currentMsg=mmgr.getCurrentMsgByFooter(userNum);
 		}
 		Vector<TeacherBean> todayTeachers=tmgr.todayTeachers();//랜덤으로 9명의 선생님 불러오기
@@ -325,7 +325,7 @@
 			document.getElementById("page_bottom").style.backgroundColor="red";//채팅 아이콘을 누를시 점멸이 멈춘다
 			url="chatting.jsp?userNum="+num;
 			window.open(url, "chat", "width=1000, height=601, scrollbars=no, location=no, toobar=no, menubar=no");
-			recentNum=temp;
+			/* recentNum=temp; */
 		}
 	}
     function alreadyStudent(){
