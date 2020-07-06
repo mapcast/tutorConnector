@@ -12,6 +12,13 @@ public class UserBean {
 	private String userBirth;
 	private String userGender;
 	private String userAddress2;
+	private int userLastMessage;
+	public int getUserLastMessage() {
+		return userLastMessage;
+	}
+	public void setUserLastMessage(int userLastMessage) {
+		this.userLastMessage = userLastMessage;
+	}
 	public int getUserNum() {
 		return userNum;
 	}

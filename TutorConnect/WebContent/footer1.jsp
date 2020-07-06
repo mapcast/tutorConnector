@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=EUC-KR"%>
+<%@ page contentType="text/html; charset=UTF-8"%>
 <%
 		request.setCharacterEncoding("EUC-KR");
 %>
@@ -201,19 +201,19 @@
    
 <div class="divpadding">
    <div class="footerbox"><br>
-	<a href="#" class="footera"><div class="footeritem"><p class="ptext">ÀÌ¿ë¾à°ü</p></div></a> 
-	<a href="#" class="footera"><div class="footeritem"><p class="ptext">°³ÀÎÁ¤º¸ Ã³¸®¹æÄ§</p></div></a>
-	<a href="#" class="footera"><div class="footeritem"><p class="ptext">Á¦ÈÞÁ¦¾È</p></div></a>
-	<a href="#" class="footera"><div class="footeritem"><p class="ptext">°í°´¼¾ÅÍ</p></div></a>
+	<a href="#" class="footera"><div class="footeritem"><p class="ptext">ì´ìš©ì•½ê´€</p></div></a> 
+	<a href="#" class="footera"><div class="footeritem"><p class="ptext">ê°œì¸ì •ë³´ ì²˜ë¦¬ë°©ì¹¨</p></div></a>
+	<a href="#" class="footera"><div class="footeritem"><p class="ptext">ì œíœ´ì œì•ˆ</p></div></a>
+	<a href="#" class="footera"><div class="footeritem"><p class="ptext">ê³ ê°ì„¼í„°</p></div></a>
   </div>
   </div>
 
 <div class="divpadding">
 	<div class="footerbox"><br>
   
-	  <div class="footerdiv"><p class="ptext">È¸»ç¼Ò°³ </p></div>
-  <div class="footerdiv"><p class="ptext">³×ÀÌ¹ö ºí·Î±×</p></div>
-  <div class="footerdiv"><p class="ptext">À¯Æ©ºê</p></div>
+	  <div class="footerdiv"><p class="ptext">íšŒì‚¬ì†Œê°œ </p></div>
+  <div class="footerdiv"><p class="ptext">ë„¤ì´ë²„ ë¸”ë¡œê·¸</p></div>
+  <div class="footerdiv"><p class="ptext">ìœ íŠœë¸Œ</p></div>
   
    </div>
    </div>
@@ -221,25 +221,25 @@
    <div class="divpadding">
    <div class="footerbox"><br>
    
-   <a href="#" class="footera"><div class="footeritem"><p class="ptext">°ú¿ÜÄ¿³ØÅÍÆÀ</p></div></a>
-   <a href="#" class="footera"><div class="footeritem"><p class="ptext">°ú¿ÜÄ¿³ØÅÍÆÀ Ä«Ä«¿ÀÅå</p></div></a>
-   <a href="#" class="footera"><div class="footeritem"><p class="ptext">°ú¿ÜÄ¿³ØÅÍÆÀ ÆäÀÌ½ººÏ</p></div></a>
-   <a href="#" class="footera"><div class="footeritem"><p class="ptext">°ú¿ÜÄ¿³ØÅÍÆÀ ÀÎ½ºÅ¸±×·¥</p></div></a>
+   <a href="#" class="footera"><div class="footeritem"><p class="ptext">ê³¼ì™¸ì»¤ë„¥í„°íŒ€</p></div></a>
+   <a href="#" class="footera"><div class="footeritem"><p class="ptext">ê³¼ì™¸ì»¤ë„¥í„°íŒ€ ì¹´ì¹´ì˜¤í†¡</p></div></a>
+   <a href="#" class="footera"><div class="footeritem"><p class="ptext">ê³¼ì™¸ì»¤ë„¥í„°íŒ€ íŽ˜ì´ìŠ¤ë¶</p></div></a>
+   <a href="#" class="footera"><div class="footeritem"><p class="ptext">ê³¼ì™¸ì»¤ë„¥í„°íŒ€ ì¸ìŠ¤íƒ€ê·¸ëž¨</p></div></a>
    </div>
    </div>
  <div class="divpadding">
       <div class="footerbox"><br>
       
-   <div class="footerdiv"><p class="ptext">°ú¿ÜÄ¿³ØÅÍ ¼Ò°³</p></div>
-   <div class="footerdiv"><p class="ptext">°ú¿ÜÄ¿³ØÅÍ AI</p></div>
-   <div class="footerdiv"><p class="ptext">ºñÁî´Ï½º</p></div>
-   <div class="footerdiv"><p class="ptext">È«º¸Ã¤³Î</p></div>
+   <div class="footerdiv"><p class="ptext">ê³¼ì™¸ì»¤ë„¥í„° ì†Œê°œ</p></div>
+   <div class="footerdiv"><p class="ptext">ê³¼ì™¸ì»¤ë„¥í„° AI</p></div>
+   <div class="footerdiv"><p class="ptext">ë¹„ì¦ˆë‹ˆìŠ¤</p></div>
+   <div class="footerdiv"><p class="ptext">í™ë³´ì±„ë„</p></div>
  
    </div>
    </div>
     </footer>
       <footer class="footer1">
-     <div><p class="fotp">»ç¾÷ÀÚµî·Ï¹øÈ£ : 244-44-77777  &nbsp;&nbsp; (48262)ºÎ»ê±¤¿ª½Ã Áø±¸ 525 (ºÎ»êITºôµù)</p></div>
+     <div><p class="fotp">ì‚¬ì—…ìžë“±ë¡ë²ˆí˜¸ : 244-44-77777  &nbsp;&nbsp; (48262)ë¶€ì‚°ê´‘ì—­ì‹œ ì§„êµ¬ 525 (ë¶€ì‚°ITë¹Œë”©)</p></div>
   
   </footer>
 

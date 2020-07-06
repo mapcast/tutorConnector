@@ -15,8 +15,8 @@
 		if(session.getAttribute("userNum")!=null){
 			userNum=(Integer)session.getAttribute("userNum");
 			bean=mgr.getUser(userNum);
-			/* userLastMessage=bean.getUserLastMessage(); */
-			currentMsg=mmgr.getCurrentMsgByFooter(userNum);
+			/* userLastMessage=bean.getUserLastMessage();  */
+			currentMsg=bean.getUserLastMessage(); 
 		}
 		Vector<TeacherBean> todayTeachers=tmgr.todayTeachers();//랜덤으로 9명의 선생님 불러오기
 %>
@@ -280,6 +280,7 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script>
     var recentNum=<%=currentMsg%>
+    
     var temp=0;
     var flashflag=false;//채팅 아이콘 점멸을 위한 boolean 변수
     function flashChat(){
@@ -312,10 +313,10 @@
     }
     var checkMessage;
 	checkMessage=setInterval(loop, 1000);
-<%-- 	var usm=<%=userLastMessage%>
+ 	var usm=<%=userLastMessage%>
 	if(recentNum!=usm){
 		goFlash=setInterval(flashChat(), 1000);
-	} --%> //버그로 인해 사용불가.
+	}//버그로 인해 사용불가.
 	
     function openChatting(num){
 		if(num==0){
@@ -596,7 +597,7 @@
       </div>
     </div>
 	<div include-html="footer.jsp"></div>
-	<footer include-html="footer1.jsp"></footer>
+	<div include-html="footer1.jsp"></div>
     <script>
       includeHTML();
       $(function () {

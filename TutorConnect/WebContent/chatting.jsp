@@ -12,7 +12,7 @@
 		int userNum=Integer.parseInt(request.getParameter("userNum"));
 		UserBean myInfo=umgr.getUser(userNum);
 		int userLastMessage=mmgr.getCurrentMsgByFooter(userNum);
-		/* umgr.updateUserLastMessage(userNum, userLastMessage);  */
+		umgr.updateUserLastMessage(userNum, userLastMessage); 
 		//채팅 아이콘 반짝이는 효과를 페이지 이동시 사라지지 않게 하려고 넣었으나 돔 로드 이슈때문에 현재는 중단.
 		String ip=request.getRemoteAddr();
 		String myImg="";
